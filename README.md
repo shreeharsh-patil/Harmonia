@@ -1,6 +1,6 @@
 # Harmonia Mobile — Landing Page
 
-A promotional landing page for [Harmonia Mobile](https://github.com/shreeharsh-patil/Harmonia-mobile), a source-available React Native / Expo music player with free multi-source streaming (JioSaavn, YouTube Music), LRCLib synced lyrics, offline downloads, and native background playback.
+A promotional landing page for [Harmonia Mobile](https://github.com/shreeharsh-patil/Harmonia), a source-available React Native / Expo music player with free multi-source streaming (JioSaavn, YouTube Music), LRCLib synced lyrics, offline downloads, and native background playback.
 
 The page renders live repository telemetry — star counts, fork counts, release tags, APK sizes and download totals — pulled from the GitHub REST API on the server, with fallback to verified build telemetry.
 
