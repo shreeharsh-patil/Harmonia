@@ -34,10 +34,8 @@ export function GlassCard({
 
   function onMove(e: React.PointerEvent<HTMLDivElement>) {
     if (!interactive) return
-    const rect = ref.current?.getBoundingClientRect()
-    if (!rect) return
-    x.set(e.clientX - rect.left)
-    y.set(e.clientY - rect.top)
+    x.set(e.nativeEvent.offsetX)
+    y.set(e.nativeEvent.offsetY)
   }
 
   function onLeave() {
@@ -51,7 +49,7 @@ export function GlassCard({
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       className={cn(
-        'group/card relative overflow-hidden rounded-[22px] glass',
+        'group/card relative overflow-hidden rounded-[22px] glass transform-gpu',
         'transition-all duration-300 [transition-timing-function:var(--ease-out-expo)]',
         interactive && 'hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_24px_60px_-20px_rgba(24,201,100,0.18)]',
         className,

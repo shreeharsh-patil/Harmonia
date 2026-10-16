@@ -153,7 +153,6 @@ export function LyricsCard() {
 
         painted.current.row[li] = step
         row.style.opacity = String(LINE_FALLOFF_ALPHA[step])
-        row.style.filter = step === 0 ? 'none' : `blur(${LINE_FALLOFF_BLUR[step]}px)`
         row.style.transform = `scale(${distance === 0 ? 1 : INACTIVE_SCALE})`
       }
 

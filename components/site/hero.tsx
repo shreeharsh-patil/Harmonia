@@ -1,7 +1,6 @@
 'use client'
 
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+import { motion } from 'framer-motion'
 import { ArrowDownToLine, ArrowUpRight, Github, History, Star } from 'lucide-react'
 import { FaAndroid, FaApple, FaTv, FaWindows } from 'react-icons/fa'
 import { AppDemo } from '@/components/ui/app-demo'
@@ -26,15 +25,6 @@ const PLATFORMS = [
 
 export function Hero() {
   const { data } = useTelemetry()
-  const sectionRef = useRef<HTMLElement>(null)
-
-  // Parallax: the copy and the demo drift at different rates as the hero leaves.
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start start', 'end start'],
-  })
-  const demoY = useTransform(scrollYProgress, [0, 1], ['0%', '-14%'])
-  const copyY = useTransform(scrollYProgress, [0, 1], ['0%', '22%'])
 
   const latest = data?.latest ?? null
   const tag = latest?.tag
@@ -43,7 +33,7 @@ export function Hero() {
   const download = resolveDownload(latest)
 
   return (
-    <section id="top" ref={sectionRef} className="relative overflow-hidden pb-20 pt-16 sm:pb-28 sm:pt-20">
+    <section id="top" className="relative overflow-hidden pb-20 pt-16 sm:pb-28 sm:pt-20">
       {/*
         A film of noise, so the flat black has some tooth to it rather than
         reading as a dead void. The grid that used to sit here as well is gone:
@@ -59,10 +49,7 @@ export function Hero() {
           video fills it with no side gap at either breakpoint. */}
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,330px)] lg:gap-14">
         {/* ------------------------------ copy ------------------------------ */}
-        <motion.div
-          className="flex flex-col items-center text-center lg:items-start lg:text-left"
-          style={{ y: copyY }}
-        >
+        <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           {/* Announcement pill */}
           <Reveal>
             <a
@@ -207,12 +194,11 @@ export function Hero() {
               ))}
             </ul>
           </Reveal>
-        </motion.div>
+        </div>
 
         {/* ----------------------------- showcase ---------------------------- */}
         <motion.div
           className="relative"
-          style={{ y: demoY }}
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring', stiffness: 70, damping: 20, delay: 0.2 }}

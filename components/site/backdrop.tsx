@@ -23,8 +23,8 @@ import { useEffect, useRef, useState } from 'react'
  */
 export function Backdrop() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const spotlightRef = useRef<HTMLDivElement>(null)
   const [isPointerDevice, setIsPointerDevice] = useState(false)
-  const [cursorActive, setCursorActive] = useState(false)
 
   useEffect(() => {
     // Detect fine pointer devices (desktop mouse/trackpad)
@@ -45,6 +45,8 @@ export function Backdrop() {
     let currentY = -1000
     let targetX = -1000
     let targetY = -1000
+    let isScrolling = false
+    let scrollTimer: NodeJS.Timeout | null = null
 
     const tick = () => {
       currentX += (targetX - currentX) * 0.15
@@ -55,7 +57,7 @@ export function Backdrop() {
         containerRef.current.style.setProperty('--cursor-y', `${currentY.toFixed(1)}px`)
       }
 
-      if (Math.abs(targetX - currentX) > 0.2 || Math.abs(targetY - currentY) > 0.2) {
+      if (Math.abs(targetX - currentX) > 0.3 || Math.abs(targetY - currentY) > 0.3) {
         rafId = requestAnimationFrame(tick)
       } else {
         rafId = null
@@ -63,9 +65,13 @@ export function Backdrop() {
     }
 
     const handlePointerMove = (e: PointerEvent) => {
+      if (isScrolling) return
       targetX = e.clientX
       targetY = e.clientY
-      setCursorActive(true)
+
+      if (spotlightRef.current) {
+        spotlightRef.current.style.opacity = '1'
+      }
 
       if (!rafId) {
         rafId = requestAnimationFrame(tick)
@@ -73,7 +79,21 @@ export function Backdrop() {
     }
 
     const handlePointerLeave = () => {
-      setCursorActive(false)
+      if (spotlightRef.current) {
+        spotlightRef.current.style.opacity = '0'
+      }
+    }
+
+    const handleScroll = () => {
+      isScrolling = true
+      if (rafId) {
+        cancelAnimationFrame(rafId)
+        rafId = null
+      }
+      if (scrollTimer) clearTimeout(scrollTimer)
+      scrollTimer = setTimeout(() => {
+        isScrolling = false
+      }, 120)
     }
 
     const handleVisibility = () => {
@@ -84,14 +104,17 @@ export function Backdrop() {
     }
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    window.addEventListener('scroll', handleScroll, { passive: true })
     document.addEventListener('mouseleave', handlePointerLeave)
     document.addEventListener('visibilitychange', handleVisibility)
 
     return () => {
       mediaQuery.removeEventListener('change', handleMediaChange)
       window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('scroll', handleScroll)
       document.removeEventListener('mouseleave', handlePointerLeave)
       document.removeEventListener('visibilitychange', handleVisibility)
+      if (scrollTimer) clearTimeout(scrollTimer)
       if (rafId) cancelAnimationFrame(rafId)
     }
   }, [])
@@ -105,50 +128,50 @@ export function Backdrop() {
         {
           '--cursor-x': '-1000px',
           '--cursor-y': '-1000px',
+          contain: 'strict',
         } as React.CSSProperties
       }
     >
-      {/* ---------------- 1. Animated Organic Aurora Blobs ---------------- */}
+      {/* ---------------- 1. Hardware-Accelerated Diffused Aurora Blobs (Zero Blur Filter Cost) ---------------- */}
       {/* Blob 1: Hero right side emerald glow */}
       <div
-        className="absolute -top-[10rem] right-[2%] h-[56rem] w-[56rem] rounded-full opacity-[0.24] blur-[130px] sm:h-[66rem] sm:w-[66rem] animate-aurora-slow"
+        className="absolute -top-[10rem] right-[2%] h-[56rem] w-[56rem] rounded-full sm:h-[66rem] sm:w-[66rem] animate-aurora-slow"
         style={{
           background:
-            'radial-gradient(circle at center, #18C964 0%, rgba(6,78,59,0.7) 45%, rgba(5,8,7,0) 72%)',
-          contain: 'paint',
+            'radial-gradient(circle at center, rgba(24,201,100,0.20) 0%, rgba(6,78,59,0.14) 28%, rgba(6,78,59,0.04) 52%, transparent 72%)',
+          willChange: 'transform',
           transform: 'translate3d(0, 0, 0)',
         }}
       />
 
       {/* Blob 2: Deep forest green ambient drift */}
       <div
-        className="absolute top-[6rem] right-[22%] h-[46rem] w-[54rem] rounded-full opacity-[0.32] blur-[140px] sm:h-[54rem] sm:w-[62rem] animate-aurora-reverse"
+        className="absolute top-[6rem] right-[22%] h-[46rem] w-[54rem] rounded-full sm:h-[54rem] sm:w-[62rem] animate-aurora-reverse"
         style={{
           background:
-            'radial-gradient(ellipse at center, #064E3B 0%, rgba(10,17,14,0.75) 50%, rgba(5,8,7,0) 78%)',
-          contain: 'paint',
+            'radial-gradient(ellipse at center, rgba(6,78,59,0.26) 0%, rgba(10,17,14,0.16) 36%, rgba(6,78,59,0.03) 60%, transparent 78%)',
+          willChange: 'transform',
           transform: 'translate3d(0, 0, 0)',
         }}
       />
 
       {/* Blob 3: Soft mint / teal accent stream */}
       <div
-        className="absolute top-[0rem] -right-[6rem] h-[36rem] w-[36rem] rounded-full opacity-[0.16] blur-[110px] sm:h-[42rem] sm:w-[42rem] animate-aurora-pulse"
+        className="absolute top-[0rem] -right-[6rem] h-[36rem] w-[36rem] rounded-full sm:h-[42rem] sm:w-[42rem] animate-aurora-pulse"
         style={{
           background:
-            'radial-gradient(circle at center, #A7F3D0 0%, rgba(24,201,100,0.45) 42%, rgba(5,8,7,0) 70%)',
-          contain: 'paint',
+            'radial-gradient(circle at center, rgba(167,243,208,0.15) 0%, rgba(24,201,100,0.09) 30%, rgba(6,78,59,0.02) 55%, transparent 70%)',
+          willChange: 'transform',
           transform: 'translate3d(0, 0, 0)',
         }}
       />
 
       {/* Blob 4: Soft global wash across top */}
       <div
-        className="absolute -top-[24rem] left-1/2 h-[50rem] w-[72rem] -translate-x-1/2 rounded-full opacity-[0.12] blur-[140px]"
+        className="absolute -top-[24rem] left-1/2 h-[50rem] w-[72rem] -translate-x-1/2 rounded-full"
         style={{
           background:
-            'radial-gradient(ellipse at center, #18C964 0%, rgba(6,78,59,0.4) 40%, rgba(5,8,7,0) 72%)',
-          contain: 'paint',
+            'radial-gradient(ellipse at center, rgba(24,201,100,0.08) 0%, rgba(6,78,59,0.04) 35%, transparent 72%)',
           transform: 'translate3d(0, 0, 0)',
         }}
       />
@@ -159,9 +182,9 @@ export function Backdrop() {
       {/* ---------------- 3. Interactive Pointer Radial Illumination ---------------- */}
       {isPointerDevice && (
         <div
-          className="absolute inset-0 transition-opacity duration-700 ease-out"
+          ref={spotlightRef}
+          className="absolute inset-0 opacity-0 transition-opacity duration-500 ease-out"
           style={{
-            opacity: cursorActive ? 1 : 0,
             backgroundImage:
               'linear-gradient(to right, rgba(24,201,100,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(24,201,100,0.14) 1px, transparent 1px)',
             backgroundSize: '64px 64px',
@@ -173,7 +196,7 @@ export function Backdrop() {
         />
       )}
 
-      {/* ---------------- 6. Cinematic Vignette ---------------- */}
+      {/* ---------------- 4. Cinematic Vignette ---------------- */}
       <div className="absolute inset-0 bg-[radial-gradient(125%_105%_at_50%_0%,transparent_55%,rgba(5,8,7,0.85)_100%)]" />
     </div>
   )

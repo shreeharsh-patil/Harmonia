@@ -61,11 +61,12 @@ export function AppDemo({ className }: { className?: string }) {
   // video fills that column with no side gap, and on small ones it simply
   // centres rather than growing into a full-width portrait wall.
   return (
-    <div className={cn('relative mx-auto w-full max-w-[330px] animate-float-hero', className)}>
-      {/* Soft emerald ambient backlight pulsing with the music */}
+    <div className={cn('relative mx-auto w-full max-w-[330px] animate-float-hero transform-gpu', className)}>
+      {/* Soft emerald ambient backlight */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-6 -z-10 rounded-[48px] bg-gradient-to-tr from-[#18C964]/25 via-[#064E3B]/25 to-transparent blur-2xl opacity-70 transition-opacity duration-1000"
+        className="pointer-events-none absolute -inset-8 -z-10 rounded-[56px] bg-[radial-gradient(ellipse_at_center,rgba(24,201,100,0.22)_0%,rgba(6,78,59,0.12)_45%,transparent_72%)] opacity-80"
+        style={{ contain: 'paint', willChange: 'transform' }}
       />
 
       <div className="relative overflow-hidden rounded-[34px] border border-white/15 bg-surface shadow-[0_50px_100px_-30px_rgba(0,0,0,0.95),0_0_35px_-8px_rgba(24,201,100,0.2)]">

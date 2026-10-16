@@ -284,10 +284,10 @@
 }
 
 @utility glass {
-  background-color: rgba(10, 17, 14, 0.65);
+  background-color: rgba(10, 17, 14, 0.78);
   border: 1px solid var(--color-line);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 @utility dot-matrix {

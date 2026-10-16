@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll } from 'framer-motion'
 import { ArrowDownToLine, Star } from 'lucide-react'
 import { MagneticButton } from '@/components/ui/magnetic-button'
 import { LiveMetric } from '@/components/ui/live-metric'
@@ -31,7 +31,6 @@ import { REPO_URL, resolveDownload } from '@/lib/github'
 export function Nav() {
   const { data } = useTelemetry()
   const { scrollYProgress } = useScroll()
-  const progressWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
 
   const stars = data?.repo?.stars ?? null
   const download = resolveDownload(data?.latest ?? null)
@@ -42,8 +41,8 @@ export function Nav() {
       {/* Scroll progress — full-bleed, pinned to the top of the viewport. */}
       <motion.span
         aria-hidden
-        className="fixed inset-x-0 top-0 z-[60] h-[2px] origin-left bg-white/80"
-        style={{ width: progressWidth }}
+        className="fixed inset-x-0 top-0 z-[60] h-[2px] bg-white/80"
+        style={{ scaleX: scrollYProgress, transformOrigin: '0% 50%' }}
       />
 
       <header className="relative z-40 flex justify-center px-4 pt-5">
