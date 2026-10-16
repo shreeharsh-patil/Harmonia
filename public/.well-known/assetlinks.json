@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.harmonia.app",
+      "sha256_cert_fingerprints": [
+        "B8:8F:97:4A:EB:F6:96:81:5E:E7:12:7C:BF:F1:7F:A6:6A:4C:99:2B:8C:71:51:F8:2D:90:99:D1:AC:E0:06:6F"
+      ]
+    }
+  }
+]

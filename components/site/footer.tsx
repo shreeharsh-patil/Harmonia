@@ -1,0 +1,167 @@
+'use client'
+
+import { ArrowUpRight, Bug, Github, Heart, Scale, Star } from 'lucide-react'
+import { LogoWordmark } from '@/components/ui/logo'
+import { LiveMetric } from '@/components/ui/live-metric'
+import { Reveal } from '@/components/ui/reveal'
+import { useTelemetry } from '@/components/telemetry-provider'
+import { ISSUES_URL, RELEASES_URL, REPO_URL } from '@/lib/github'
+
+const COLUMNS = [
+  {
+    title: 'Product',
+    links: [
+      { label: 'Features', href: '#features' },
+      { label: 'Audio Engine', href: '#audio-engine' },
+      { label: 'Releases', href: '#releases' },
+      { label: 'Install guide', href: '#install' },
+    ],
+  },
+  {
+    title: 'Project',
+    links: [
+      { label: 'Harmonia Mobile on GitHub', href: REPO_URL, external: true },
+      { label: 'Harmonia Backend Repo', href: 'https://github.com/shreeharsh-patil/Backend-Harmonia', external: true },
+      { label: 'All Releases & APKs', href: RELEASES_URL, external: true },
+      { label: 'Issue Tracker', href: ISSUES_URL, external: true },
+      { label: 'License', href: `${REPO_URL}/blob/main/LICENSE`, external: true },
+    ],
+  },
+  {
+    title: 'Developer',
+    links: [
+      { label: '@shreeharsh-patil', href: 'https://github.com/shreeharsh-patil', external: true },
+      { label: 'Report an Issue', href: ISSUES_URL, external: true },
+      { label: 'Star on GitHub', href: REPO_URL, external: true },
+    ],
+  },
+] as const
+
+export function Footer() {
+  const { data } = useTelemetry()
+  const stars = data?.repo?.stars ?? null
+  const year = 2026
+
+  return (
+    <footer className="relative mt-8 border-t border-line px-6 pb-10 pt-16">
+      {/* Ambient wash so the page doesn't just stop. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-96 opacity-50"
+        style={{
+          background:
+            'radial-gradient(70% 100% at 50% 100%, rgba(255,255,255,0.09), transparent 70%)',
+        }}
+      />
+
+      <div className="mx-auto max-w-6xl">
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-4 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
+          {/* Brand */}
+          <div className="col-span-2 flex flex-col gap-4 sm:col-span-4 lg:col-span-1">
+            <div className="flex items-center">
+              <LogoWordmark className="-my-2 h-[52px]" />
+            </div>
+
+            <p className="max-w-xs text-pretty text-[13px] leading-relaxed text-white/40">
+              Free, source-available music player for Android. Direct JioSaavn and YouTube Music streaming,
+              LRCLib synced lyrics, offline downloads, and native background playback. No Spotify keys. No subscriptions.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href={REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 rounded-full glass px-3 py-1.5 text-[12.5px] text-white/70 transition-colors hover:bg-white/[0.07] hover:text-white"
+              >
+                <Github className="size-3.5" aria-hidden />
+                Star
+                <span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-white/70">
+                  <Star className="size-2.5 fill-white/70" aria-hidden />
+                  <LiveMetric value={stars} digits={3} separator={false} />
+                </span>
+              </a>
+
+              <a
+                href={ISSUES_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full glass px-3 py-1.5 text-[12.5px] text-white/60 transition-colors hover:bg-white/[0.07] hover:text-white"
+              >
+                <Bug className="size-3.5" aria-hidden />
+                Report an issue
+              </a>
+            </div>
+          </div>
+
+          {/* Link columns */}
+          {COLUMNS.map((col) => (
+            <nav key={col.title} aria-label={col.title} className="flex flex-col gap-3">
+              <p className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-white/30">
+                {col.title}
+              </p>
+              <ul className="flex flex-col gap-2.5">
+                {col.links.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      {...('external' in link && link.external
+                        ? { target: '_blank', rel: 'noopener noreferrer' }
+                        : {})}
+                      className="group inline-flex items-center gap-1 text-[13px] text-white/45 transition-colors hover:text-white"
+                    >
+                      {link.label}
+                      {'external' in link && link.external ? (
+                        <ArrowUpRight
+                          className="size-3 opacity-0 transition-all duration-300 group-hover:opacity-60"
+                          aria-hidden
+                        />
+                      ) : null}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
+
+        {/* Legal */}
+        <Reveal delay={0.05}>
+          <div className="mt-14 flex flex-col gap-5 border-t border-line pt-7">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[10.5px] uppercase tracking-[0.1em] text-white/30">
+              <span className="inline-flex items-center gap-1.5">
+                <Scale className="size-3" aria-hidden />
+                Source-Available
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Heart className="size-3 text-white/45" aria-hidden />
+                Built by{' '}
+                <a
+                  href="https://github.com/shreeharsh-patil"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/55 underline decoration-white/20 underline-offset-2 transition-colors hover:text-white"
+                >
+                  @shreeharsh-patil
+                </a>
+              </span>
+              <span>© {year} Harmonia Mobile</span>
+            </div>
+
+            <p className="max-w-4xl text-pretty text-[11.5px] leading-relaxed text-white/25">
+              Personal, source-available project shared for educational and personal use. All audio is sourced
+              from free, publicly accessible providers (JioSaavn, YouTube Music, LRCLib) and local device files.
+              No Spotify API or credentials are used or required. Harmonia does not host, upload, or store copyrighted
+              media. The developer takes no responsibility for how this software is used. Use at your own risk in compliance
+              with applicable terms of service.
+            </p>
+
+            <p className="text-[11px] text-white/20">
+              Repository telemetry on this page is fetched live from the GitHub REST API and cached for five minutes.
+            </p>
+          </div>
+        </Reveal>
+      </div>
+    </footer>
+  )
+}
