@@ -21,8 +21,11 @@ export async function GET(request: NextRequest) {
     filePath = path.join(process.cwd(), 'public', 'Harmonia-mobile.apk')
   }
 
+  const GITHUB_DOWNLOAD_URL =
+    'https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.0.0/Harmonia-mobile.apk'
+
   if (!fs.existsSync(filePath)) {
-    return new NextResponse('APK file not found', { status: 404 })
+    return NextResponse.redirect(GITHUB_DOWNLOAD_URL, 302)
   }
 
   const stat = fs.statSync(filePath)

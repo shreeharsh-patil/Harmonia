@@ -59,6 +59,16 @@ const nextConfig: NextConfig = {
       ],
     },
   ],
+  rewrites: async () => [
+    {
+      source: '/Harmonia-mobile.apk',
+      destination: '/api/download?file=Harmonia-mobile.apk',
+    },
+    {
+      source: '/releases/:file*.apk',
+      destination: '/api/download?file=:file*.apk',
+    },
+  ],
 }
 
 export default nextConfig

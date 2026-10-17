@@ -84,7 +84,7 @@ const FALLBACK_RELEASES: Release[] = [
     apk: {
       name: 'Harmonia-mobile.apk',
       size: 126111874,
-      downloadUrl: '/releases/Harmonia-mobile-v2.0.0.apk',
+      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.0.0/Harmonia-mobile.apk',
       downloadCount: 1,
     },
     highlights: [
@@ -415,12 +415,15 @@ export function resolveDownload(release: Release | null): {
   size: string
   fileName: string | null
 } {
+  const GITHUB_DOWNLOAD_URL =
+    'https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.0.0/Harmonia-mobile.apk'
+
   if (release?.apk) {
     const isLatest = !release.tag || release.tag === 'v2.0.0'
     const targetUrl = release.apk.downloadUrl.startsWith('http')
       ? release.apk.downloadUrl
       : isLatest
-        ? '/Harmonia-mobile.apk'
+        ? GITHUB_DOWNLOAD_URL
         : release.apk.downloadUrl
 
     return {
@@ -431,7 +434,7 @@ export function resolveDownload(release: Release | null): {
     }
   }
   return {
-    url: '/Harmonia-mobile.apk',
+    url: GITHUB_DOWNLOAD_URL,
     isDirect: true,
     size: '120 MB',
     fileName: 'Harmonia-mobile.apk',
