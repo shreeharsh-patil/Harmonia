@@ -24,7 +24,7 @@ type MagneticButtonProps = {
   /** Max px the button leans toward the cursor. 0 disables the magnet. */
   strength?: number
   external?: boolean
-  download?: boolean
+  download?: boolean | string
   'aria-label'?: string
 }
 
@@ -104,13 +104,16 @@ export function MagneticButton({
     </>
   )
 
+  const isDownload = Boolean(download)
+  const isExternal = Boolean(external) && !isDownload
+
   const control = href ? (
     <a
       href={href}
       aria-label={ariaLabel}
       className={surface}
-      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-      {...(download ? { download: '' } : {})}
+      {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      {...(isDownload ? { download: typeof download === 'string' ? download : '' } : {})}
     >
       {inner}
     </a>

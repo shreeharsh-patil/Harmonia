@@ -3,8 +3,8 @@
 import { motion, type Variants } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
-/** Shared spring — every scroll reveal on the page uses this exact curve. */
-export const SPRING = { type: 'spring' as const, stiffness: 100, damping: 20 }
+/** Shared smooth easing transition — optimized for 120 FPS scrolling without JS spring physics overhead. */
+export const SPRING = { duration: 0.45, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }
 
 type RevealProps = {
   children: React.ReactNode
@@ -45,7 +45,7 @@ export function Reveal({
       className={className}
       initial={{ opacity: 0, ...offset }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, amount: 0.15, margin: '0px 0px -40px 0px' }}
+      viewport={{ once: true, amount: 0.05, margin: '0px 0px -20px 0px' }}
       transition={{ ...SPRING, delay }}
     >
       {children}
@@ -78,7 +78,7 @@ export function RevealGroup({
       variants={variants}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.1, margin: '0px 0px -40px 0px' }}
+      viewport={{ once: true, amount: 0.05, margin: '0px 0px -20px 0px' }}
     >
       {children}
     </motion.div>

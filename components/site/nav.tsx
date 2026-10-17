@@ -81,8 +81,7 @@ export function Nav() {
             {/* Primary CTA */}
             <MagneticButton
               href={download.url}
-              external
-              download={download.isDirect}
+              download={download.fileName ?? 'Harmonia-mobile.apk'}
               strength={4}
               className="!px-4 !py-2 !text-[13px]"
               aria-label={

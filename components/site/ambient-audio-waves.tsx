@@ -23,7 +23,7 @@ export function AmbientAudioWaves() {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="h-full w-full animate-wave-flow"
-        style={{ contain: 'paint', transform: 'translate3d(0, 0, 0)' }}
+        style={{ contain: 'paint', willChange: 'transform', transform: 'translate3d(0, 0, 0)' }}
       >
         <defs>
           {/* Wave Gradients */}

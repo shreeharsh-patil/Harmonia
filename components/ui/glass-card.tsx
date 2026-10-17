@@ -1,20 +1,14 @@
 'use client'
 
-import { useRef, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 /**
  * Elevated panel with a dynamic specular highlight that tracks the pointer.
  *
- * Two stacked layers do the work: a soft radial wash inside the card, and a
- * border-mask layer that lights only the 1px hairline edge nearest the cursor.
- * The second is what makes the border read as a physical lip rather than a flat
- * stroke.
- *
- * There is deliberately no per-card accent tint any more. The old `accent` prop
- * existed to keep a grid of cards from reading as monochrome; monochrome is now
- * the point, and the pointer wash carries the interaction on luminance alone.
+ * Highly optimized for 120 FPS scrolling: specular highlight layers only mount
+ * when the pointer actually enters a card, removing compositor overhead during scroll.
  */
 export function GlassCard({
   children,
@@ -26,6 +20,7 @@ export function GlassCard({
   interactive?: boolean
 }) {
   const ref = useRef<HTMLDivElement>(null)
+  const [isHovered, setIsHovered] = useState(false)
   const x = useMotionValue(-400)
   const y = useMotionValue(-400)
 
@@ -38,7 +33,13 @@ export function GlassCard({
     y.set(e.nativeEvent.offsetY)
   }
 
+  function onEnter() {
+    if (!interactive) return
+    setIsHovered(true)
+  }
+
   function onLeave() {
+    setIsHovered(false)
     x.set(-400)
     y.set(-400)
   }
@@ -46,29 +47,38 @@ export function GlassCard({
   return (
     <div
       ref={ref}
+      onPointerEnter={onEnter}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       className={cn(
-        'group/card relative overflow-hidden rounded-[22px] glass transform-gpu',
+        'group/card relative overflow-hidden rounded-[22px] glass',
         'transition-all duration-300 [transition-timing-function:var(--ease-out-expo)]',
-        interactive && 'hover:-translate-y-1.5 hover:border-white/20 hover:shadow-[0_24px_60px_-20px_rgba(24,201,100,0.18)]',
+        interactive && 'hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_20px_50px_-20px_rgba(24,201,100,0.18)]',
         className,
       )}
     >
-      {/* Interior specular wash. */}
-      {interactive ? (
+      {/* Interior specular wash (only active on hover) */}
+      {interactive && isHovered ? (
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-500 group-hover/card:opacity-100"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="pointer-events-none absolute inset-0 z-0"
           style={{ background: wash }}
         />
       ) : null}
 
-      {/* Lit hairline edge: the gradient is masked to a 1px inset ring. */}
-      {interactive ? (
+      {/* Lit hairline edge: the gradient is masked to a 1px inset ring (only active on hover) */}
+      {interactive && isHovered ? (
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-0 rounded-[22px] opacity-0 transition-opacity duration-500 group-hover/card:opacity-100"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="pointer-events-none absolute inset-0 z-0 rounded-[22px]"
           style={{
             background: edge,
             padding: 1,

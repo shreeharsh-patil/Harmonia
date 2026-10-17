@@ -45,16 +45,13 @@ export function Backdrop() {
     let currentY = -1000
     let targetX = -1000
     let targetY = -1000
-    let isScrolling = false
-    let scrollTimer: NodeJS.Timeout | null = null
 
     const tick = () => {
       currentX += (targetX - currentX) * 0.15
       currentY += (targetY - currentY) * 0.15
 
-      if (containerRef.current) {
-        containerRef.current.style.setProperty('--cursor-x', `${currentX.toFixed(1)}px`)
-        containerRef.current.style.setProperty('--cursor-y', `${currentY.toFixed(1)}px`)
+      if (spotlightRef.current) {
+        spotlightRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`
       }
 
       if (Math.abs(targetX - currentX) > 0.3 || Math.abs(targetY - currentY) > 0.3) {
@@ -65,7 +62,6 @@ export function Backdrop() {
     }
 
     const handlePointerMove = (e: PointerEvent) => {
-      if (isScrolling) return
       targetX = e.clientX
       targetY = e.clientY
 
@@ -84,18 +80,6 @@ export function Backdrop() {
       }
     }
 
-    const handleScroll = () => {
-      isScrolling = true
-      if (rafId) {
-        cancelAnimationFrame(rafId)
-        rafId = null
-      }
-      if (scrollTimer) clearTimeout(scrollTimer)
-      scrollTimer = setTimeout(() => {
-        isScrolling = false
-      }, 120)
-    }
-
     const handleVisibility = () => {
       if (document.hidden && rafId) {
         cancelAnimationFrame(rafId)
@@ -104,17 +88,14 @@ export function Backdrop() {
     }
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
-    window.addEventListener('scroll', handleScroll, { passive: true })
     document.addEventListener('mouseleave', handlePointerLeave)
     document.addEventListener('visibilitychange', handleVisibility)
 
     return () => {
       mediaQuery.removeEventListener('change', handleMediaChange)
       window.removeEventListener('pointermove', handlePointerMove)
-      window.removeEventListener('scroll', handleScroll)
       document.removeEventListener('mouseleave', handlePointerLeave)
       document.removeEventListener('visibilitychange', handleVisibility)
-      if (scrollTimer) clearTimeout(scrollTimer)
       if (rafId) cancelAnimationFrame(rafId)
     }
   }, [])
@@ -124,13 +105,7 @@ export function Backdrop() {
       ref={containerRef}
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-50 overflow-hidden bg-[#050807]"
-      style={
-        {
-          '--cursor-x': '-1000px',
-          '--cursor-y': '-1000px',
-          contain: 'strict',
-        } as React.CSSProperties
-      }
+      style={{ contain: 'strict' }}
     >
       {/* ---------------- 1. Hardware-Accelerated Diffused Aurora Blobs (Zero Blur Filter Cost) ---------------- */}
       {/* Blob 1: Hero right side emerald glow */}
@@ -183,15 +158,12 @@ export function Backdrop() {
       {isPointerDevice && (
         <div
           ref={spotlightRef}
-          className="absolute inset-0 opacity-0 transition-opacity duration-500 ease-out"
+          className="pointer-events-none fixed -left-[240px] -top-[240px] h-[480px] w-[480px] rounded-full opacity-0 transition-opacity duration-300 ease-out"
           style={{
-            backgroundImage:
-              'linear-gradient(to right, rgba(24,201,100,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(24,201,100,0.14) 1px, transparent 1px)',
-            backgroundSize: '64px 64px',
-            maskImage:
-              'radial-gradient(420px circle at var(--cursor-x) var(--cursor-y), black 0%, transparent 100%)',
-            WebkitMaskImage:
-              'radial-gradient(420px circle at var(--cursor-x) var(--cursor-y), black 0%, transparent 100%)',
+            background:
+              'radial-gradient(circle, rgba(24,201,100,0.13) 0%, rgba(24,201,100,0.03) 45%, transparent 70%)',
+            willChange: 'transform',
+            transform: 'translate3d(-1000px, -1000px, 0)',
           }}
         />
       )}

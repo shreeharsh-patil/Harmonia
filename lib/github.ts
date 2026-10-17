@@ -80,7 +80,7 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-10-14T17:31:29Z',
     prerelease: false,
     body: 'Harmonia Mobile 2.0.0 standalone Android APK. Includes corrected Previous/Next notification and lock-screen controls. Built with the persistent Harmonia EAS Android signing identity for consistent sideloaded updates.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/tag/v2.0.0',
+    htmlUrl: RELEASES_URL,
     apk: {
       name: 'Harmonia-mobile.apk',
       size: 126111874,
@@ -100,7 +100,7 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-10-13T16:34:07Z',
     prerelease: false,
     body: 'Harmonia Mobile 1.8.2 standalone Android APK. Includes corrected notification actions and audio playback stability improvements.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/tag/v1.8.2',
+    htmlUrl: RELEASES_URL,
     apk: {
       name: 'Harmonia-mobile-1.8.2.apk',
       size: 124894942,
@@ -119,7 +119,7 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-09-29T18:27:46Z',
     prerelease: false,
     body: 'Harmonia Mobile 1.8.0 standalone Android APK. Built with the existing Harmonia release signing identity.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/tag/v1.8.0',
+    htmlUrl: RELEASES_URL,
     apk: {
       name: 'Harmonia-mobile-1.8.0.apk',
       size: 124828286,
@@ -138,7 +138,7 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-09-25T16:49:17Z',
     prerelease: false,
     body: 'Harmonia Mobile 1.1.2 standalone Android APK. Sideload updates and enhanced streaming stability.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/tag/v1.1.2',
+    htmlUrl: RELEASES_URL,
     apk: {
       name: 'Harmonia-mobile-1.1.2.apk',
       size: 119549409,
@@ -156,7 +156,7 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-09-25T06:00:13Z',
     prerelease: false,
     body: 'Harmonia Mobile 1.1.0 standalone Android APK. Includes Expo Observe/Insights instrumentation and latest fixes.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/tag/v1.1.0',
+    htmlUrl: RELEASES_URL,
     apk: {
       name: 'Harmonia-mobile-1.1.0.apk',
       size: 72329852,
@@ -174,7 +174,7 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-09-20T16:13:17Z',
     prerelease: false,
     body: 'Harmonia Mobile 1.0.0 standalone Android APK. Includes the latest Library, podcast discovery and playback, and Google sign-in redirect handling.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/tag/v1.0.0',
+    htmlUrl: RELEASES_URL,
     apk: {
       name: 'Harmonia-mobile-1.0.0.apk',
       size: 71640599,
@@ -193,7 +193,7 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-09-20T14:15:24Z',
     prerelease: false,
     body: 'Initial preview APK build for Android devices.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/tag/phone-build',
+    htmlUrl: RELEASES_URL,
     apk: {
       name: 'Harmonia-mobile-phone-build.apk',
       size: 71604703,
@@ -321,7 +321,7 @@ function normalizeRelease(raw: RawRelease): Release {
       ? {
           name: apkRaw.name ?? 'Harmonia-mobile.apk',
           size: apkRaw.size ?? 0,
-          downloadUrl: `/releases/Harmonia-mobile-${tag}.apk`,
+          downloadUrl: apkRaw.browser_download_url || `/releases/Harmonia-mobile-${tag}.apk`,
           downloadCount: apkRaw.download_count ?? 0,
         }
       : null,
@@ -417,10 +417,16 @@ export function resolveDownload(release: Release | null): {
 } {
   if (release?.apk) {
     const isLatest = !release.tag || release.tag === 'v2.0.0'
+    const targetUrl = release.apk.downloadUrl.startsWith('http')
+      ? release.apk.downloadUrl
+      : isLatest
+        ? '/Harmonia-mobile.apk'
+        : release.apk.downloadUrl
+
     return {
-      url: isLatest ? '/Harmonia-mobile.apk' : release.apk.downloadUrl,
+      url: targetUrl,
       isDirect: true,
-      size: formatBytes(release.apk.size || 126143530),
+      size: formatBytes(release.apk.size || 126111874),
       fileName: release.apk.name || 'Harmonia-mobile.apk',
     }
   }

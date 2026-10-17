@@ -120,13 +120,12 @@ export function Install() {
           <div className="mt-10 flex flex-col items-center gap-3">
             <MagneticButton
               href={download.url}
-              external
-              download={download.isDirect}
+              download={download.fileName ?? 'Harmonia-mobile.apk'}
               className="!px-7 !py-3.5"
               aria-label={
                 download.isDirect
                   ? `Download Harmonia Mobile APK ${tag ?? 'latest'}, ${download.size}`
-                  : 'View Harmonia Mobile releases on GitHub'
+                  : 'View Harmonia Mobile releases'
               }
             >
               <ArrowDownToLine className="size-4 transition-transform duration-300 group-hover/btn:translate-y-0.5" aria-hidden />

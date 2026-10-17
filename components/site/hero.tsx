@@ -53,9 +53,7 @@ export function Hero() {
           {/* Announcement pill */}
           <Reveal>
             <a
-              href={latest?.htmlUrl ?? RELEASES_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#changelog"
               className="group inline-flex items-center gap-2.5 rounded-full border border-emerald-500/20 bg-[#0A110E]/80 backdrop-blur-md px-3.5 py-1.5 text-[12.5px] transition-all duration-300 hover:border-emerald-500/40 hover:bg-[#0A110E]"
             >
               <span className="relative flex size-2 shrink-0">
@@ -97,13 +95,12 @@ export function Hero() {
             <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <MagneticButton
                 href={download.url}
-                external
-                download={download.isDirect}
+                download={download.fileName ?? 'Harmonia-mobile.apk'}
                 className="!px-6 !py-3.5"
                 aria-label={
                   download.isDirect
                     ? `Download Harmonia Mobile APK ${tag ?? 'latest'}, ${download.size}`
-                    : 'View Harmonia Mobile releases on GitHub'
+                    : 'View Harmonia Mobile releases'
                 }
               >
                 <ArrowDownToLine className="size-4 transition-transform duration-200 group-hover/btn:translate-y-0.5" aria-hidden />
@@ -116,8 +113,7 @@ export function Hero() {
               </MagneticButton>
 
               <MagneticButton
-                href={RELEASES_URL}
-                external
+                href="#changelog"
                 variant="secondary"
                 className="!px-5 !py-3.5"
               >

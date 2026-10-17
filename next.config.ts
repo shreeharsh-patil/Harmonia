@@ -16,6 +16,40 @@ const nextConfig: NextConfig = {
   },
   headers: async () => [
     {
+      source: '/Harmonia-mobile.apk',
+      headers: [
+        {
+          key: 'Content-Type',
+          value: 'application/vnd.android.package-archive',
+        },
+        {
+          key: 'Content-Disposition',
+          value: 'attachment; filename="Harmonia-mobile.apk"',
+        },
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=86400',
+        },
+      ],
+    },
+    {
+      source: '/releases/:file*.apk',
+      headers: [
+        {
+          key: 'Content-Type',
+          value: 'application/vnd.android.package-archive',
+        },
+        {
+          key: 'Content-Disposition',
+          value: 'attachment',
+        },
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable',
+        },
+      ],
+    },
+    {
       source: '/:all*(svg|jpg|png|webp|avif|mp4)',
       headers: [
         {

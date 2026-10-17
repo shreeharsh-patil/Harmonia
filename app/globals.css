@@ -220,7 +220,6 @@
   }
 
   html {
-    scroll-behavior: smooth;
     scroll-padding-top: 2rem;
     -webkit-tap-highlight-color: transparent;
     color-scheme: dark;
@@ -232,9 +231,8 @@
     color: var(--color-fg);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
+    text-rendering: optimizeSpeed;
     overflow-x: clip;
-    -webkit-overflow-scrolling: touch;
   }
 
   ::selection {
@@ -284,10 +282,10 @@
 }
 
 @utility glass {
-  background-color: rgba(10, 17, 14, 0.78);
+  background-color: rgba(10, 17, 14, 0.88);
   border: 1px solid var(--color-line);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 @utility dot-matrix {
