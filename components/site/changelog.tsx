@@ -18,7 +18,7 @@ import {
 import { cn } from '@/lib/utils'
 
 /** How many releases the timeline shows before the "view all" affordance. */
-const VISIBLE = 4
+const VISIBLE = 10
 
 export function Changelog() {
   const { data } = useTelemetry()
@@ -30,6 +30,7 @@ export function Changelog() {
 
   return (
     <section id="releases" className="relative scroll-mt-28 px-6 py-16 sm:py-24">
+      <span id="changelog" className="absolute -top-28" aria-hidden />
       <div className="mx-auto max-w-4xl">
         <SectionHeading
           eyebrow="Release stream"

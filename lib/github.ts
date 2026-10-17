@@ -80,7 +80,7 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-10-14T17:31:29Z',
     prerelease: false,
     body: 'Harmonia Mobile 2.0.0 standalone Android APK. Includes corrected Previous/Next notification and lock-screen controls. Built with the persistent Harmonia EAS Android signing identity for consistent sideloaded updates.',
-    htmlUrl: RELEASES_URL,
+    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/tag/v2.0.0',
     apk: {
       name: 'Harmonia-mobile.apk',
       size: 126111874,
@@ -100,11 +100,11 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-10-13T16:34:07Z',
     prerelease: false,
     body: 'Harmonia Mobile 1.8.2 standalone Android APK. Includes corrected notification actions and audio playback stability improvements.',
-    htmlUrl: RELEASES_URL,
+    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/v1.8.2',
     apk: {
       name: 'Harmonia-mobile-1.8.2.apk',
       size: 124894942,
-      downloadUrl: '/releases/Harmonia-mobile-v1.8.2.apk',
+      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/v1.8.2/Harmonia-mobile-1.8.2.apk',
       downloadCount: 1,
     },
     highlights: [
@@ -119,11 +119,11 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-09-29T18:27:46Z',
     prerelease: false,
     body: 'Harmonia Mobile 1.8.0 standalone Android APK. Built with the existing Harmonia release signing identity.',
-    htmlUrl: RELEASES_URL,
+    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/v1.8.0',
     apk: {
       name: 'Harmonia-mobile-1.8.0.apk',
       size: 124828286,
-      downloadUrl: '/releases/Harmonia-mobile-v1.8.0.apk',
+      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/v1.8.0/Harmonia-mobile-1.8.0.apk',
       downloadCount: 1,
     },
     highlights: [
@@ -138,11 +138,11 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-09-25T16:49:17Z',
     prerelease: false,
     body: 'Harmonia Mobile 1.1.2 standalone Android APK. Sideload updates and enhanced streaming stability.',
-    htmlUrl: RELEASES_URL,
+    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/v1.1.2',
     apk: {
       name: 'Harmonia-mobile-1.1.2.apk',
       size: 119549409,
-      downloadUrl: '/releases/Harmonia-mobile-v1.1.2.apk',
+      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/v1.1.2/Harmonia-mobile-1.1.2.apk',
       downloadCount: 1,
     },
     highlights: [
@@ -156,11 +156,11 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-09-25T06:00:13Z',
     prerelease: false,
     body: 'Harmonia Mobile 1.1.0 standalone Android APK. Includes Expo Observe/Insights instrumentation and latest fixes.',
-    htmlUrl: RELEASES_URL,
+    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/v1.1.0',
     apk: {
       name: 'Harmonia-mobile-1.1.0.apk',
       size: 72329852,
-      downloadUrl: '/releases/Harmonia-mobile-v1.1.0.apk',
+      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/v1.1.0/Harmonia-mobile-1.1.0.apk',
       downloadCount: 1,
     },
     highlights: [
@@ -174,11 +174,11 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-09-20T16:13:17Z',
     prerelease: false,
     body: 'Harmonia Mobile 1.0.0 standalone Android APK. Includes the latest Library, podcast discovery and playback, and Google sign-in redirect handling.',
-    htmlUrl: RELEASES_URL,
+    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/v1.0.0',
     apk: {
       name: 'Harmonia-mobile-1.0.0.apk',
       size: 71640599,
-      downloadUrl: '/releases/Harmonia-mobile-v1.0.0.apk',
+      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/v1.0.0/Harmonia-mobile-1.0.0.apk',
       downloadCount: 1,
     },
     highlights: [
@@ -193,11 +193,11 @@ const FALLBACK_RELEASES: Release[] = [
     publishedAt: '2026-09-20T14:15:24Z',
     prerelease: false,
     body: 'Initial preview APK build for Android devices.',
-    htmlUrl: RELEASES_URL,
+    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/phone-build',
     apk: {
       name: 'Harmonia-mobile-phone-build.apk',
       size: 71604703,
-      downloadUrl: '/releases/Harmonia-mobile-phone-build.apk',
+      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/phone-build/Harmonia-mobile-phone-build.apk',
       downloadCount: 1,
     },
     highlights: [
@@ -330,9 +330,10 @@ function normalizeRelease(raw: RawRelease): Release {
 }
 
 export async function getTelemetry(): Promise<Telemetry> {
-  const [repoRaw, releasesRaw] = await Promise.all([
+  const [repoRaw, releasesRaw, mobileReleasesRaw] = await Promise.all([
     getJson<RawRepo>(`/repos/${REPO_SLUG}`),
     getJson<RawRelease[]>(`/repos/${REPO_SLUG}/releases?per_page=100`),
+    getJson<RawRelease[]>(`/repos/${REPO_OWNER}/Harmonia-mobile/releases?per_page=100`),
   ])
 
   const repo: RepoStats = repoRaw
@@ -348,9 +349,33 @@ export async function getTelemetry(): Promise<Telemetry> {
       }
     : FALLBACK_REPO
 
-  const fetchedReleases = Array.isArray(releasesRaw) && releasesRaw.length > 0
-    ? releasesRaw.filter((r) => !r.draft).map(normalizeRelease)
-    : FALLBACK_RELEASES
+  // Guarantee that all historical releases are always present
+  const releaseMap = new Map<string, Release>()
+
+  // 1. Seed with verified baseline historical releases (all 7 releases)
+  for (const fallback of FALLBACK_RELEASES) {
+    releaseMap.set(fallback.tag, fallback)
+  }
+
+  // 2. Overlay live releases from Harmonia-mobile repository (live assets, dates, download counts)
+  if (Array.isArray(mobileReleasesRaw)) {
+    for (const r of mobileReleasesRaw) {
+      if (!r.draft && r.tag_name) {
+        releaseMap.set(r.tag_name, normalizeRelease(r))
+      }
+    }
+  }
+
+  // 3. Overlay releases from primary Harmonia repository (e.g. latest v2.0.0 release)
+  if (Array.isArray(releasesRaw)) {
+    for (const r of releasesRaw) {
+      if (!r.draft && r.tag_name) {
+        releaseMap.set(r.tag_name, normalizeRelease(r))
+      }
+    }
+  }
+
+  const fetchedReleases = Array.from(releaseMap.values())
 
   fetchedReleases.sort((a, b) => {
     const at = a.publishedAt ? Date.parse(a.publishedAt) : 0
