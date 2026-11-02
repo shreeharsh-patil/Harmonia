@@ -15,7 +15,14 @@ export function Metrics() {
   const forks = data?.repo?.forks ?? null
   const issues = data?.repo?.openIssues ?? null
   const releases = data?.releaseCount ?? null
-  const downloads = data?.totalDownloads ?? null
+  // Recompute the total from the release assets too: a stale telemetry snapshot
+  // can carry totalDownloads: 0 while the per-release counts are non-zero, which
+  // is what rendered "0 downloads" on the live site.
+  const assetDownloads = data?.releases?.reduce(
+    (sum, release) => sum + (release.apk?.downloadCount ?? 0),
+    0,
+  )
+  const downloads = data ? Math.max(data.totalDownloads ?? 0, assetDownloads ?? 0) : null
   const license = data?.repo?.license ?? null
 
   return (

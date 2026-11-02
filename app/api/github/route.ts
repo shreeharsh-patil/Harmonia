@@ -16,7 +16,9 @@ export async function GET() {
     headers: {
       // Serve stale copies while revalidating so a GitHub rate limit never turns
       // into a user-visible failure.
-      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=1800',
+      // s-maxage caches at the CDN, but browsers must revalidate: a cached
+      // response was serving a zero download count long after it was stale.
+      'Cache-Control': 'public, max-age=0, s-maxage=300, stale-while-revalidate=1800',
     },
   })
 }

@@ -29,26 +29,48 @@ export function TelemetryProvider({
   const [data, setData] = useState<Telemetry | null>(initial)
 
   useEffect(() => {
-    // Server data is good — no client request needed.
-    if (initial && !initial.degraded) return
-
     let cancelled = false
     const controller = new AbortController()
 
-    fetch('/api/github', { signal: controller.signal })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json: Telemetry | null) => {
-        if (cancelled || !json) return
-        // Only replace if the retry actually did better than what we have.
-        setData((prev) => (prev && !prev.degraded ? prev : json))
-      })
-      .catch(() => {
-        /* Offline or rate-limited: keep whatever we have and let the UI degrade. */
-      })
+    const refresh = () => {
+      fetch('/api/github', { signal: controller.signal, cache: 'no-store' })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((json: Telemetry | null) => {
+          if (cancelled || !json) return
+          setData((prev) => {
+            if (!prev) return json
+            // Never let a degraded retry replace good server data.
+            if (json.degraded && !prev.degraded) return prev
+            // Counters only move up. Guard against a stale/zero snapshot
+            // overwriting a real download total that is already on screen.
+            if (
+              !json.degraded &&
+              !prev.degraded &&
+              json.totalDownloads < prev.totalDownloads
+            ) {
+              return prev
+            }
+            return json
+          })
+        })
+        .catch(() => {
+          /* Offline or rate-limited: keep whatever we have and let the UI degrade. */
+        })
+    }
+
+    // Always re-sync once, even when the server render was healthy: a cached
+    // snapshot is what made the download counter read 0 while downloads existed.
+    refresh()
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') refresh()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
 
     return () => {
       cancelled = true
       controller.abort()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
     }
   }, [initial])
 
