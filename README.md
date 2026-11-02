@@ -59,6 +59,40 @@ The dev server runs on **http://localhost:3100**.
 | `GITHUB_TOKEN` | No | Raises the GitHub REST API rate limit from 60 requests/hour to 5,000/hour. |
 | `NEXT_PUBLIC_SITE_URL` | No | Overrides canonical domain URL for SEO tags. |
 
+## Releases and downloads
+
+The landing page never links to the private app source repository. GitHub returns
+`404` for release assets of a private repository when the visitor is not signed
+in, so every download URL is normalised onto the public mirror:
+
+| Item | Value |
+| --- | --- |
+| Download repository | `shreeharsh-patil/Harmonia` (public) |
+| Latest APK alias | `https://github.com/shreeharsh-patil/Harmonia/releases/latest/download/Harmonia-mobile.apk` |
+| Version-pinned APK | `https://github.com/shreeharsh-patil/Harmonia/releases/download/<tag>/Harmonia-mobile.apk` |
+
+Releases are ordered by **semantic version**, not by `published_at`: GitHub
+restamps the publish date whenever a release is edited, which previously made an
+older build look like the newest one. The `latest` shown in the hero, nav,
+install section and JSON-LD all come from that ordering, so a new v2.1.4 outranks
+v2.1.3 even if v2.1.3 is edited afterwards.
+
+To ship a new build:
+
+1. Publish the APK as a release asset on the public repository, named
+   `Harmonia-mobile.apk`, alongside `Harmonia-mobile.apk.sha256` and
+   `update-manifest.json`.
+2. Nothing else. The page revalidates every 5 minutes and the primary CTA points
+   at the `releases/latest/download` alias, so the new file is downloadable even
+   while cached telemetry still names the previous version.
+3. If the GitHub API is rate-limited for the deployment, the page falls back to
+   `FALLBACK_RELEASES` in `lib/github.ts`. Update that list when the version
+   changes so the fallback never advertises a stale build.
+
+`GITHUB_TOKEN` (optional) lifts the API rate limit only; it is never used to
+download APKs. Self-hosted deployments may drop APKs into
+`public/releases/` and keep `file=` downloads local instead of redirecting.
+
 ## Scripts
 
 | Command | Description |

@@ -21,8 +21,10 @@ export async function GET(request: NextRequest) {
     filePath = path.join(process.cwd(), 'public', 'Harmonia-mobile.apk')
   }
 
+  // Public mirror. The private app repository's release URLs require
+  // authentication and return 404 for visitors.
   const GITHUB_DOWNLOAD_URL =
-    'https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.0.0/Harmonia-mobile.apk'
+    'https://github.com/shreeharsh-patil/Harmonia/releases/latest/download/Harmonia-mobile.apk'
 
   if (!fs.existsSync(filePath)) {
     return NextResponse.redirect(GITHUB_DOWNLOAD_URL, 302)

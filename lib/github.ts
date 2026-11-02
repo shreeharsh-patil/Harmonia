@@ -19,6 +19,15 @@ export const RELEASES_URL = `${REPO_URL}/releases`
 export const ISSUES_URL = `${REPO_URL}/issues`
 export const LATEST_RELEASE_URL = `${RELEASES_URL}/latest`
 
+/**
+ * Public, unauthenticated download endpoint.
+ *
+ * APK assets live on the public `Harmonia` repository. The app source repository
+ * (`Harmonia-mobile`) is private, so its release asset URLs return 404 for
+ * visitors. Every download URL is normalised to this repository.
+ */
+export const LATEST_APK_URL = `${LATEST_RELEASE_URL}/download/Harmonia-mobile.apk`
+
 const API_ROOT = 'https://api.github.com'
 
 /** Seconds before cached GitHub data is considered stale and refetched. */
@@ -73,18 +82,107 @@ export type Telemetry = {
   fetchedAt: string
 }
 
+const PUBLIC_RELEASE_URL = (tag: string, file = 'Harmonia-mobile.apk') =>
+  `${RELEASES_URL}/download/${tag}/${file}`
+
+const PUBLIC_RELEASE_PAGE = (tag: string) => `${RELEASES_URL}/tag/${tag}`
+
+/**
+ * Verified build telemetry for the public download repository.
+ *
+ * Only releases whose APK is publicly mirrored are listed here. Older private
+ * builds are intentionally omitted: surfacing them would advertise downloads
+ * that visitors cannot access without repository access.
+ */
 const FALLBACK_RELEASES: Release[] = [
+  {
+    tag: 'v2.1.3',
+    name: 'Harmonia Mobile 2.1.3',
+    publishedAt: '2026-11-01T19:43:49Z',
+    prerelease: false,
+    body: 'Harmonia Mobile 2.1.3 standalone Android APK. Includes automatic in-app updates with SHA-256 integrity verification, native lock-screen/notification Previous/Next controls, synchronized lyrics, and equalizer. Built with the persistent Harmonia EAS Android signing identity for consistent sideloaded updates.',
+    htmlUrl: PUBLIC_RELEASE_PAGE('v2.1.3'),
+    apk: {
+      name: 'Harmonia-mobile.apk',
+      size: 128211430,
+      downloadUrl: PUBLIC_RELEASE_URL('v2.1.3'),
+      downloadCount: 1,
+    },
+    highlights: [
+      'Automatic in-app updates with SHA-256 integrity verification',
+      'Native lock-screen and notification Previous/Next controls',
+      'Synchronized lyrics suite and five-band equalizer',
+      'Built with the persistent Harmonia EAS Android signing identity',
+    ],
+  },
+  {
+    tag: 'v2.1.2',
+    name: 'Harmonia Mobile 2.1.2',
+    publishedAt: '2026-11-01T17:47:17Z',
+    prerelease: false,
+    body: 'Harmonia Mobile 2.1.2 standalone Android APK. Playback stability and lock-screen control polish ahead of the 2.1.3 release.',
+    htmlUrl: PUBLIC_RELEASE_PAGE('v2.1.2'),
+    apk: {
+      name: 'Harmonia-mobile.apk',
+      size: 128195830,
+      downloadUrl: PUBLIC_RELEASE_URL('v2.1.2'),
+      downloadCount: 1,
+    },
+    highlights: [
+      'Playback stability and recovery improvements',
+      'Native media navigation controls on the lock screen',
+      'Full offline library downloads and synchronized lyrics',
+    ],
+  },
+  {
+    tag: 'v2.1.1',
+    name: 'Harmonia Mobile 2.1.1',
+    publishedAt: '2026-11-01T15:30:20Z',
+    prerelease: false,
+    body: 'Harmonia Mobile 2.1.1 standalone Android APK. Adaptive audio pipeline and notification-control fixes.',
+    htmlUrl: PUBLIC_RELEASE_PAGE('v2.1.1'),
+    apk: {
+      name: 'Harmonia-mobile.apk',
+      size: 127087742,
+      downloadUrl: PUBLIC_RELEASE_URL('v2.1.1'),
+      downloadCount: 1,
+    },
+    highlights: [
+      'Adaptive audio pipeline fixes',
+      'Notification Previous/Next reliability',
+      'Equalizer and synced lyrics improvements',
+    ],
+  },
+  {
+    tag: 'v2.1.0',
+    name: 'Harmonia Mobile 2.1.0',
+    publishedAt: '2026-10-31T19:31:19Z',
+    prerelease: false,
+    body: 'Harmonia Mobile 2.1.0 standalone Android APK. Includes corrected Previous/Next notification and lock-screen controls. Built with the persistent Harmonia EAS Android signing identity for consistent sideloaded updates.',
+    htmlUrl: PUBLIC_RELEASE_PAGE('v2.1.0'),
+    apk: {
+      name: 'Harmonia-mobile.apk',
+      size: 127372326,
+      downloadUrl: PUBLIC_RELEASE_URL('v2.1.0'),
+      downloadCount: 1,
+    },
+    highlights: [
+      'Corrected Previous/Next notification and lock-screen controls',
+      'Persistent EAS Android signing identity for consistent sideloaded updates',
+      'Multi-source adaptive playback pipeline (JioSaavn, YouTube Music, local audio)',
+    ],
+  },
   {
     tag: 'v2.0.0',
     name: 'Harmonia Mobile 2.0.0',
-    publishedAt: '2026-10-14T17:31:29Z',
+    publishedAt: '2026-10-17T03:35:14Z',
     prerelease: false,
     body: 'Harmonia Mobile 2.0.0 standalone Android APK. Includes corrected Previous/Next notification and lock-screen controls. Built with the persistent Harmonia EAS Android signing identity for consistent sideloaded updates.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/tag/v2.0.0',
+    htmlUrl: PUBLIC_RELEASE_PAGE('v2.0.0'),
     apk: {
       name: 'Harmonia-mobile.apk',
       size: 126111874,
-      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.0.0/Harmonia-mobile.apk',
+      downloadUrl: PUBLIC_RELEASE_URL('v2.0.0'),
       downloadCount: 1,
     },
     highlights: [
@@ -92,116 +190,6 @@ const FALLBACK_RELEASES: Release[] = [
       'Persistent EAS Android signing identity for consistent sideloaded updates',
       'Multi-source adaptive playback pipeline (JioSaavn, YouTube Music, local audio)',
       'LRCLib synced lyrics with word and character-level timing',
-    ],
-  },
-  {
-    tag: 'v1.8.2',
-    name: 'Harmonia Mobile 1.8.2',
-    publishedAt: '2026-10-13T16:34:07Z',
-    prerelease: false,
-    body: 'Harmonia Mobile 1.8.2 standalone Android APK. Includes corrected notification actions and audio playback stability improvements.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/v1.8.2',
-    apk: {
-      name: 'Harmonia-mobile-1.8.2.apk',
-      size: 124894942,
-      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/v1.8.2/Harmonia-mobile-1.8.2.apk',
-      downloadCount: 1,
-    },
-    highlights: [
-      'Improved lock-screen notification media controls',
-      'Audio buffer handling and recovery optimizations',
-      'Updated home screen collections and Top Mixes routing',
-    ],
-  },
-  {
-    tag: 'v1.8.0',
-    name: 'Harmonia Mobile 1.8.0',
-    publishedAt: '2026-09-29T18:27:46Z',
-    prerelease: false,
-    body: 'Harmonia Mobile 1.8.0 standalone Android APK. Built with the existing Harmonia release signing identity.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/v1.8.0',
-    apk: {
-      name: 'Harmonia-mobile-1.8.0.apk',
-      size: 124828286,
-      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/v1.8.0/Harmonia-mobile-1.8.0.apk',
-      downloadCount: 1,
-    },
-    highlights: [
-      'Offline downloads through Expo FileSystem into private app storage',
-      'Local device music scanning with Expo Media Library',
-      'Network-aware quality ceilings for Wi-Fi and mobile data',
-    ],
-  },
-  {
-    tag: 'v1.1.2',
-    name: 'Harmonia Mobile 1.1.2',
-    publishedAt: '2026-09-25T16:49:17Z',
-    prerelease: false,
-    body: 'Harmonia Mobile 1.1.2 standalone Android APK. Sideload updates and enhanced streaming stability.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/v1.1.2',
-    apk: {
-      name: 'Harmonia-mobile-1.1.2.apk',
-      size: 119549409,
-      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/v1.1.2/Harmonia-mobile-1.1.2.apk',
-      downloadCount: 1,
-    },
-    highlights: [
-      'Direct JioSaavn resolution with YouTube Music fallback',
-      'Battery Saver mode reducing background preloading work',
-    ],
-  },
-  {
-    tag: 'v1.1.0',
-    name: 'Harmonia Mobile 1.1.0',
-    publishedAt: '2026-09-25T06:00:13Z',
-    prerelease: false,
-    body: 'Harmonia Mobile 1.1.0 standalone Android APK. Includes Expo Observe/Insights instrumentation and latest fixes.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/v1.1.0',
-    apk: {
-      name: 'Harmonia-mobile-1.1.0.apk',
-      size: 72329852,
-      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/v1.1.0/Harmonia-mobile-1.1.0.apk',
-      downloadCount: 1,
-    },
-    highlights: [
-      'Native expo-audio background playback engine',
-      'Queue management, sleep timer, and playback speed control',
-    ],
-  },
-  {
-    tag: 'v1.0.0',
-    name: 'Harmonia Mobile 1.0.0',
-    publishedAt: '2026-09-20T16:13:17Z',
-    prerelease: false,
-    body: 'Harmonia Mobile 1.0.0 standalone Android APK. Includes the latest Library, podcast discovery and playback, and Google sign-in redirect handling.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/v1.0.0',
-    apk: {
-      name: 'Harmonia-mobile-1.0.0.apk',
-      size: 71640599,
-      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/v1.0.0/Harmonia-mobile-1.0.0.apk',
-      downloadCount: 1,
-    },
-    highlights: [
-      'Initial production release of Harmonia Mobile',
-      'Home, Search, Library, and Profile experience',
-      'Free streaming from JioSaavn and YouTube Music with no Spotify keys',
-    ],
-  },
-  {
-    tag: 'phone-build',
-    name: 'Harmonia Mobile 0.3.9 APK',
-    publishedAt: '2026-09-20T14:15:24Z',
-    prerelease: false,
-    body: 'Initial preview APK build for Android devices.',
-    htmlUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/tag/phone-build',
-    apk: {
-      name: 'Harmonia-mobile-phone-build.apk',
-      size: 71604703,
-      downloadUrl: 'https://github.com/shreeharsh-patil/Harmonia-mobile/releases/download/phone-build/Harmonia-mobile-phone-build.apk',
-      downloadCount: 1,
-    },
-    highlights: [
-      'First Android phone build testing direct audio resolution',
     ],
   },
 ]
@@ -270,6 +258,7 @@ type RawRelease = {
   assets?: RawAsset[]
 }
 
+
 function parseHighlights(body: string, limit = 4): string[] {
   const lines = body.split(/\r?\n/)
   const bullets: string[] = []
@@ -304,6 +293,25 @@ function parseHighlights(body: string, limit = 4): string[] {
   return [cleaned.length > 220 ? `${cleaned.slice(0, 217)}...` : cleaned]
 }
 
+/**
+ * Rewrites any historical/private asset URL onto the public mirror repository.
+ * Live API data should already be public, but this keeps stale cache entries and
+ * hand-written fallbacks from ever leaking an inaccessible `Harmonia-mobile` URL
+ * to the browser.
+ */
+function toPublicDownloadUrl(url: string, tag: string): string {
+  if (!url || !url.startsWith('http')) return PUBLIC_RELEASE_URL(tag)
+  return url
+    .replace(
+      /github\.com\/shreeharsh-patil\/Harmonia-mobile\/releases\/download\/[^/]+\//,
+      'github.com/shreeharsh-patil/Harmonia/releases/download/',
+    )
+    .replace(
+      /github\.com\/shreeharsh-patil\/Harmonia-mobile\/releases\/latest\/download\//,
+      'github.com/shreeharsh-patil/Harmonia/releases/latest/download/',
+    )
+}
+
 function normalizeRelease(raw: RawRelease): Release {
   const assets = raw.assets ?? []
   const apkRaw = assets.find((a) => a.name?.toLowerCase().endsWith('.apk'))
@@ -316,12 +324,15 @@ function normalizeRelease(raw: RawRelease): Release {
     publishedAt: raw.published_at ?? null,
     prerelease: Boolean(raw.prerelease),
     body,
-    htmlUrl: raw.html_url ?? `${RELEASES_URL}/tag/${tag}`,
+    htmlUrl: (raw.html_url ?? `${RELEASES_URL}/tag/${tag}`).replace(
+      'github.com/shreeharsh-patil/Harmonia-mobile/releases',
+      'github.com/shreeharsh-patil/Harmonia/releases',
+    ),
     apk: apkRaw?.browser_download_url
       ? {
           name: apkRaw.name ?? 'Harmonia-mobile.apk',
           size: apkRaw.size ?? 0,
-          downloadUrl: apkRaw.browser_download_url || `/releases/Harmonia-mobile-${tag}.apk`,
+          downloadUrl: toPublicDownloadUrl(apkRaw.browser_download_url, tag),
           downloadCount: apkRaw.download_count ?? 0,
         }
       : null,
@@ -329,11 +340,38 @@ function normalizeRelease(raw: RawRelease): Release {
   }
 }
 
+/** Semver-aware rank so a re-published mirror never outranks a newer build. */
+function releaseRank(tag: string): number[] {
+  const match = tag.trim().match(/^v?(\d+)\.(\d+)\.(\d+)/i)
+  if (!match) return [-1, -1, -1]
+  return [Number(match[1]), Number(match[2]), Number(match[3])]
+}
+
+/**
+ * Newest-first ordering by semantic version, then publish time.
+ *
+ * GitHub restamps `published_at` whenever a release is edited, so v2.1.0 ended
+ * up "newer" than v2.1.3 and the site advertised the wrong latest build. Sorting
+ * on the tag itself is the only stable definition of latest. Exported so the
+ * ordering can be tested without the GitHub API.
+ */
+export function compareReleases(a: Release, b: Release): number {
+  const ar = releaseRank(a.tag)
+  const br = releaseRank(b.tag)
+  for (let i = 0; i < 3; i += 1) {
+    if (ar[i] !== br[i]) return br[i] - ar[i]
+  }
+  const at = a.publishedAt ? Date.parse(a.publishedAt) : 0
+  const bt = b.publishedAt ? Date.parse(b.publishedAt) : 0
+  return bt - at
+}
+
 export async function getTelemetry(): Promise<Telemetry> {
-  const [repoRaw, releasesRaw, mobileReleasesRaw] = await Promise.all([
+  // Only the public repository is read. The app source repo is private, so its
+  // release assets cannot be downloaded by visitors and must never be surfaced.
+  const [repoRaw, releasesRaw] = await Promise.all([
     getJson<RawRepo>(`/repos/${REPO_SLUG}`),
     getJson<RawRelease[]>(`/repos/${REPO_SLUG}/releases?per_page=100`),
-    getJson<RawRelease[]>(`/repos/${REPO_OWNER}/Harmonia-mobile/releases?per_page=100`),
   ])
 
   const repo: RepoStats = repoRaw
@@ -349,39 +387,32 @@ export async function getTelemetry(): Promise<Telemetry> {
       }
     : FALLBACK_REPO
 
-  // Guarantee that all historical releases are always present
+  // Guarantee that the public download history is always present, even when the
+  // GitHub API is rate-limited or offline.
   const releaseMap = new Map<string, Release>()
 
-  // 1. Seed with verified baseline historical releases (all 7 releases)
+  // 1. Seed with verified public releases.
   for (const fallback of FALLBACK_RELEASES) {
     releaseMap.set(fallback.tag, fallback)
   }
 
-  // 2. Overlay live releases from Harmonia-mobile repository (live assets, dates, download counts)
-  if (Array.isArray(mobileReleasesRaw)) {
-    for (const r of mobileReleasesRaw) {
-      if (!r.draft && r.tag_name) {
-        releaseMap.set(r.tag_name, normalizeRelease(r))
-      }
-    }
-  }
-
-  // 3. Overlay releases from primary Harmonia repository (e.g. latest v2.0.0 release)
+  // 2. Overlay live public releases (fresh assets, dates, download counts).
   if (Array.isArray(releasesRaw)) {
     for (const r of releasesRaw) {
       if (!r.draft && r.tag_name) {
-        releaseMap.set(r.tag_name, normalizeRelease(r))
+        const normalized = normalizeRelease(r)
+        // A live release without an uploaded APK must not erase a verified
+        // fallback download link.
+        if (!normalized.apk) {
+          const fallback = releaseMap.get(normalized.tag)
+          if (fallback?.apk) normalized.apk = fallback.apk
+        }
+        releaseMap.set(normalized.tag, normalized)
       }
     }
   }
 
-  const fetchedReleases = Array.from(releaseMap.values())
-
-  fetchedReleases.sort((a, b) => {
-    const at = a.publishedAt ? Date.parse(a.publishedAt) : 0
-    const bt = b.publishedAt ? Date.parse(b.publishedAt) : 0
-    return bt - at
-  })
+  const fetchedReleases = Array.from(releaseMap.values()).sort(compareReleases)
 
   const totalDownloads = fetchedReleases.reduce((sum, r) => sum + (r.apk?.downloadCount ?? 0), 0)
 
@@ -391,7 +422,7 @@ export async function getTelemetry(): Promise<Telemetry> {
     releaseCount: fetchedReleases.length,
     latest: fetchedReleases[0] ?? null,
     totalDownloads,
-    degraded: false,
+    degraded: !repoRaw || !Array.isArray(releasesRaw),
     fetchedAt: new Date().toISOString(),
   }
 }
@@ -440,28 +471,21 @@ export function resolveDownload(release: Release | null): {
   size: string
   fileName: string | null
 } {
-  const GITHUB_DOWNLOAD_URL =
-    'https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.0.0/Harmonia-mobile.apk'
-
   if (release?.apk) {
-    const isLatest = !release.tag || release.tag === 'v2.0.0'
-    const targetUrl = release.apk.downloadUrl.startsWith('http')
-      ? release.apk.downloadUrl
-      : isLatest
-        ? GITHUB_DOWNLOAD_URL
-        : release.apk.downloadUrl
-
     return {
-      url: targetUrl,
+      url: toPublicDownloadUrl(release.apk.downloadUrl, release.tag),
       isDirect: true,
-      size: formatBytes(release.apk.size || 126111874),
+      size: formatBytes(release.apk.size),
       fileName: release.apk.name || 'Harmonia-mobile.apk',
     }
   }
+
+  // Always fall back to the public mirror's moving "latest" asset, never a
+  // version-pinned APK from the private app repository.
   return {
-    url: GITHUB_DOWNLOAD_URL,
+    url: LATEST_APK_URL,
     isDirect: true,
-    size: '120 MB',
+    size: '122 MB',
     fileName: 'Harmonia-mobile.apk',
   }
 }
