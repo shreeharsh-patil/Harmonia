@@ -15,7 +15,6 @@ const COLUMNS = [
       { label: 'Audio Engine', href: '#audio-engine' },
       { label: 'Releases', href: '#releases' },
       { label: 'Install guide', href: '#install' },
-      { label: 'Spotify Mod APK Alternative', href: '/spotify-mod-apk-alternative' },
     ],
   },
   {

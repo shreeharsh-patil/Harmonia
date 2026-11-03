@@ -108,7 +108,7 @@ connect it:
    you, and redeploy. The layout only renders the meta tag when the variable is
    set; it is never fabricated.
 4. Submit `https://listenharmonia.vercel.app/sitemap.xml` and request indexing
-   for the homepage and `https://listenharmonia.vercel.app/spotify-mod-apk-alternative`.
+   for the homepage.
 
 Do not claim a `google-site-verification` value you do not control.
 
@@ -126,8 +126,6 @@ Do not claim a `google-site-verification` value you do not control.
 ```
 app/
   api/github/route.ts    Telemetry refresh endpoint
-  spotify-mod-apk-alternative/
-                        Search-targeted, honest Spotify-mod-APK-alternative page
   globals.css            Tailwind tokens and animations
   layout.tsx             Metadata, SEO tags, font definitions
   page.tsx               Server component: fetches telemetry and composes sections
