@@ -1,20 +1,19 @@
 'use client'
 
-import { GitFork, Package, ShieldCheck, Star } from 'lucide-react'
+import { Download, Package, ShieldCheck, Star } from 'lucide-react'
 import { GlassCard } from '@/components/ui/glass-card'
 import { LiveMetric } from '@/components/ui/live-metric'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RevealGroup, RevealItem } from '@/components/ui/reveal'
 import { useTelemetry } from '@/components/telemetry-provider'
-import { RELEASES_URL, REPO_URL, formatCompact } from '@/lib/github'
+import { RELEASES_URL, REPO_URL } from '@/lib/github'
 
 export function Metrics() {
   const { data } = useTelemetry()
 
   const stars = data?.repo?.stars ?? null
-  const forks = data?.repo?.forks ?? null
-  const issues = data?.repo?.openIssues ?? null
   const releases = data?.releaseCount ?? null
+  const latest = data?.latest?.tag ?? null
   // Recompute the total from the release assets too: a stale telemetry snapshot
   // can carry totalDownloads: 0 while the per-release counts are non-zero, which
   // is what rendered "0 downloads" on the live site.
@@ -55,35 +54,34 @@ export function Metrics() {
               value={<LiveMetric value={releases} digits={1} />}
               label="Production & Beta Releases"
               foot={
-                downloads === null ? (
+                latest === null ? (
                   <Skeleton className="h-2.5 w-28" />
                 ) : (
                   <>
-                    <span className="font-mono text-white/70">
-                      {formatCompact(downloads)}
-                    </span>{' '}
-                    APK downloads
+                    <span className="font-mono text-white/70">{latest}</span> currently shipping
                   </>
                 )
               }
             />
           </RevealItem>
 
-          {/* Forks */}
+          {/* Downloads */}
           <RevealItem>
             <MetricTile
-              href={`${REPO_URL}/forks`}
-              icon={<GitFork className="size-4 text-white/70" aria-hidden />}
-              value={<LiveMetric value={forks} digits={2} />}
-              label="Open Source Contributors & Forks"
+              href="https://github.com/shreeharsh-patil/Harmonia/releases"
+              icon={<Download className="size-4 text-white/70" aria-hidden />}
+              value={<LiveMetric value={downloads} digits={2} />}
+              label="APK Downloads"
               foot={
-                issues === null ? (
-                  <Skeleton className="h-2.5 w-24" />
+                downloads === null ? (
+                  <Skeleton className="h-2.5 w-28" />
                 ) : (
-                  // Plain text, not a link: this sits inside the tile's own
-                  // anchor and nesting <a> inside <a> is invalid HTML.
                   <>
-                    <span className="font-mono text-white/70">{issues}</span> open issues
+                    across{' '}
+                    <span className="font-mono text-white/70">
+                      {releases ?? '—'}
+                    </span>{' '}
+                    public releases
                   </>
                 )
               }

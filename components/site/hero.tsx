@@ -10,7 +10,7 @@ import { LiveMetric } from '@/components/ui/live-metric'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Reveal } from '@/components/ui/reveal'
 import { useTelemetry } from '@/components/telemetry-provider'
-import { RELEASES_URL, REPO_URL, resolveDownload } from '@/lib/github'
+import { REPO_URL, resolveDownload } from '@/lib/github'
 import { cn } from '@/lib/utils'
 
 /**

@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils'
 
 import {
   LINE_FALLOFF_ALPHA,
-  LINE_FALLOFF_BLUR,
   LYRIC_EASING,
   LYRIC_SETTLE_MS,
   INACTIVE_SCALE,
