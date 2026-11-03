@@ -58,6 +58,7 @@ The dev server runs on **http://localhost:3100**.
 | --- | --- | --- |
 | `GITHUB_TOKEN` | No | Raises the GitHub REST API rate limit from 60 requests/hour to 5,000/hour. |
 | `NEXT_PUBLIC_SITE_URL` | No | Overrides canonical domain URL for SEO tags. |
+| `GOOGLE_SITE_VERIFICATION` | No | Enables the Google Search Console `google-site-verification` meta tag. |
 
 ## Releases and downloads
 
@@ -93,6 +94,24 @@ To ship a new build:
 download APKs. Self-hosted deployments may drop APKs into
 `public/releases/` and keep `file=` downloads local instead of redirecting.
 
+## Google Search Console
+
+The site is crawlable without extra work, but Google only discovers and indexes
+it reliably after the property is verified and the sitemap is submitted. To
+connect it:
+
+1. Open Google Search Console and add the URL-prefix property
+   `https://listenharmonia.vercel.app`.
+2. Pick an HTML verification method.
+3. Add the verification string as `GOOGLE_SITE_VERIFICATION` in the Vercel
+   project environment (Production), matching the meta tag value Google gives
+   you, and redeploy. The layout only renders the meta tag when the variable is
+   set; it is never fabricated.
+4. Submit `https://listenharmonia.vercel.app/sitemap.xml` and request indexing
+   for the homepage and `https://listenharmonia.vercel.app/spotify-mod-apk-alternative`.
+
+Do not claim a `google-site-verification` value you do not control.
+
 ## Scripts
 
 | Command | Description |
@@ -107,6 +126,8 @@ download APKs. Self-hosted deployments may drop APKs into
 ```
 app/
   api/github/route.ts    Telemetry refresh endpoint
+  spotify-mod-apk-alternative/
+                        Search-targeted, honest Spotify-mod-APK-alternative page
   globals.css            Tailwind tokens and animations
   layout.tsx             Metadata, SEO tags, font definitions
   page.tsx               Server component: fetches telemetry and composes sections

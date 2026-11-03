@@ -16,6 +16,7 @@ const jetbrains = JetBrains_Mono({
 })
 
 const TITLE = 'Harmonia Mobile — Free Native Music Player for Android'
+const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION
 const DESCRIPTION =
   'Source-available Android music player powered by React Native and Expo. Free high-quality streaming from JioSaavn and YouTube Music, LRCLib synced lyrics, offline downloads, and native background playback with no subscriptions or Spotify keys.'
 
@@ -96,6 +97,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${jakarta.variable} ${jetbrains.variable}`}>
       <head>
+        {GOOGLE_SITE_VERIFICATION ? (
+          // Set GOOGLE_SITE_VERIFICATION in Vercel after creating the URL-prefix
+          // property in Google Search Console, then redeploy.
+          <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />
+        ) : null}
         <link rel="dns-prefetch" href="https://api.github.com" />
         <link rel="dns-prefetch" href="https://avatars.githubusercontent.com" />
         <link rel="preconnect" href="https://avatars.githubusercontent.com" crossOrigin="anonymous" />
