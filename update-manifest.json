@@ -1,20 +1,21 @@
 {
   "platform": "android",
-  "version": "2.1.3",
-  "versionCode": 45,
+  "version": "2.1.4",
+  "versionCode": 46,
   "minimumSupportedVersionCode": 40,
   "channel": "production",
   "mandatory": false,
   "releaseNotes": [
-    "High-performance music playback and adaptive audio pipeline",
-    "Automatic in-app update engine with SHA-256 integrity verification",
+    "Uninterrupted background playback with dedicated Android Service wake locks",
+    "Continuous auto-advance track transitions without pausing",
+    "Eliminated unmounted React component state updates during deep link resolution",
     "Full offline library downloads, synchronized lyrics suite, and equalizer"
   ],
-  "apkUrl": "https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.1.3/Harmonia-mobile.apk",
+  "apkUrl": "https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.1.4/Harmonia-mobile.apk",
   "sha256": "58949fe121ff101d5bc64eca1f7587a8ff489acd1ed79441cf106c398071750b",
-  "fileSize": 128211430,
-  "releasedAt": "2026-11-01T19:43:40Z",
-  "latestVersion": "2.1.3",
+  "fileSize": 124828286,
+  "releasedAt": "2026-11-06T18:00:00Z",
+  "latestVersion": "2.1.4",
   "minimumSupportedVersion": "2.0.0",
-  "downloadUrl": "https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.1.3/Harmonia-mobile.apk"
+  "downloadUrl": "https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.1.4/Harmonia-mobile.apk"
 }

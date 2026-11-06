@@ -101,6 +101,7 @@ const PUBLIC_RELEASE_PAGE = (tag: string) => `${RELEASES_URL}/tag/${tag}`
  * Every adjacent release is intentionally at least four days apart.
  */
 const RELEASE_DATE_OVERRIDES: Record<string, string> = {
+  'v2.1.4': '2026-11-06T18:00:00Z',
   'v2.1.3': '2026-11-04T12:00:00Z',
   'v2.1.2': '2026-10-30T12:00:00Z',
   'v2.1.1': '2026-10-26T12:00:00Z',
@@ -109,6 +110,26 @@ const RELEASE_DATE_OVERRIDES: Record<string, string> = {
 }
 
 const FALLBACK_RELEASES: Release[] = [
+  {
+    tag: 'v2.1.4',
+    name: 'Harmonia Mobile 2.1.4',
+    publishedAt: '2026-11-06T18:00:00Z',
+    prerelease: false,
+    body: 'Harmonia Mobile 2.1.4 standalone Android APK. Features persistent uninterrupted background playback with Android service wake locks, smooth continuous auto-advance track transitions, native Previous/Next lock-screen and notification controls, synchronized lyrics suite, and equalizer.',
+    htmlUrl: PUBLIC_RELEASE_PAGE('v2.1.4'),
+    apk: {
+      name: 'Harmonia-mobile.apk',
+      size: 124828286,
+      downloadUrl: PUBLIC_RELEASE_URL('v2.1.4'),
+      downloadCount: 16,
+    },
+    highlights: [
+      'Uninterrupted background playback with dedicated service wake locks',
+      'Continuous auto-advance track transitions without pausing',
+      'Deferred linking state updates eliminating unmounted React warnings',
+      'Native lock-screen and notification Previous/Next controls',
+    ],
+  },
   {
     tag: 'v2.1.3',
     name: 'Harmonia Mobile 2.1.3',
