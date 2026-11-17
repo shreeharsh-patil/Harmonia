@@ -59,7 +59,7 @@ export function Install() {
                 key={step.title}
                 initial={{ opacity: 0, y: 22 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
+                viewport={{ once: true, amount: 0.15 }}
                 transition={{ type: 'spring', stiffness: 100, damping: 20, delay: i * 0.1 }}
                 onMouseEnter={() => setActive(i)}
                 onFocusCapture={() => setActive(i)}
@@ -101,11 +101,12 @@ export function Install() {
                       {step.detail}
                     </p>
 
-                    {/* Progress rail — fills on the active card. */}
+                    {/* Progress rail — fills on the active card (GPU scaleX). */}
                     <div className="mt-4 h-px w-full overflow-hidden bg-white/[0.07]">
                       <motion.div
-                        className="h-full bg-white"
-                        animate={{ width: isActive ? '100%' : '0%' }}
+                        className="h-full w-full origin-left bg-white will-change-transform"
+                        initial={false}
+                        animate={{ scaleX: isActive ? 1 : 0 }}
                         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                       />
                     </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowDownToLine, ArrowUpRight, CircleDot, ExternalLink, Tag } from 'lucide-react'
 import { Reveal, SectionHeading } from '@/components/ui/reveal'
@@ -23,13 +23,36 @@ const VISIBLE = 10
 export function Changelog() {
   const { data } = useTelemetry()
   const [expanded, setExpanded] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        el.dataset.inView = entry?.isIntersecting ? 'true' : 'false'
+      },
+      { threshold: 0 },
+    )
+    io.observe(el)
+
+    const onVisibility = () => {
+      el.dataset.paused = document.hidden ? 'true' : 'false'
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    return () => {
+      io.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [])
 
   const releases = data?.releases ?? null
   const shown = releases ? (expanded ? releases : releases.slice(0, VISIBLE)) : null
   const hasMore = Boolean(releases && releases.length > VISIBLE)
 
   return (
-    <section id="releases" className="relative scroll-mt-28 px-6 py-16 sm:py-24">
+    <section ref={sectionRef} id="releases" className="relative scroll-mt-28 px-6 py-16 sm:py-24">
       <span id="changelog" className="absolute -top-28" aria-hidden />
       <div className="mx-auto max-w-4xl">
         <SectionHeading
@@ -114,8 +137,8 @@ function TimelineEntry({
       className="relative pl-11 sm:pl-14"
       initial={{ opacity: 0, x: -16 }}
       whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: index * 0.07 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: Math.min(index, 4) * 0.06 }}
     >
       {/* Node */}
       <span

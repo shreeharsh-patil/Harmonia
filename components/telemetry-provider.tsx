@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { MotionConfig } from 'framer-motion'
 import type { Telemetry } from '@/lib/github'
 
 type TelemetryState = {
@@ -10,6 +11,21 @@ type TelemetryState = {
 }
 
 const TelemetryContext = createContext<TelemetryState>({ data: null, loading: true })
+
+const REFRESH_MIN_INTERVAL_MS = 60_000
+
+function hasMeaningfulChange(prev: Telemetry, next: Telemetry): boolean {
+  return (
+    prev.degraded !== next.degraded ||
+    prev.totalDownloads !== next.totalDownloads ||
+    prev.releaseCount !== next.releaseCount ||
+    prev.latest?.tag !== next.latest?.tag ||
+    prev.repo?.stars !== next.repo?.stars ||
+    prev.repo?.forks !== next.repo?.forks ||
+    prev.repo?.openIssues !== next.repo?.openIssues ||
+    prev.repo?.watchers !== next.repo?.watchers
+  )
+}
 
 /**
  * Distributes GitHub telemetry to every client island on the page.
@@ -27,12 +43,17 @@ export function TelemetryProvider({
   children: React.ReactNode
 }) {
   const [data, setData] = useState<Telemetry | null>(initial)
+  const lastFetchRef = useRef<number>(0)
 
   useEffect(() => {
     let cancelled = false
     const controller = new AbortController()
 
-    const refresh = () => {
+    const refresh = (force = false) => {
+      const now = Date.now()
+      if (!force && now - lastFetchRef.current < REFRESH_MIN_INTERVAL_MS) return
+      lastFetchRef.current = now
+
       fetch('/api/github', { signal: controller.signal, cache: 'no-store' })
         .then((res) => (res.ok ? res.json() : null))
         .then((json: Telemetry | null) => {
@@ -50,6 +71,8 @@ export function TelemetryProvider({
             ) {
               return prev
             }
+            // Skip re-rendering the entire tree when values match SSR initial.
+            if (!hasMeaningfulChange(prev, json)) return prev
             return json
           })
         })
@@ -58,12 +81,11 @@ export function TelemetryProvider({
         })
     }
 
-    // Always re-sync once, even when the server render was healthy: a cached
-    // snapshot is what made the download counter read 0 while downloads existed.
-    refresh()
+    // Re-sync once after mount if needed, without triggering redundant re-renders when identical.
+    refresh(true)
 
     const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible') refresh()
+      if (document.visibilityState === 'visible') refresh(false)
     }
     document.addEventListener('visibilitychange', onVisibilityChange)
 
@@ -75,9 +97,11 @@ export function TelemetryProvider({
   }, [initial])
 
   return (
-    <TelemetryContext.Provider value={{ data, loading: data === null }}>
-      {children}
-    </TelemetryContext.Provider>
+    <MotionConfig reducedMotion="user">
+      <TelemetryContext.Provider value={{ data, loading: data === null }}>
+        {children}
+      </TelemetryContext.Provider>
+    </MotionConfig>
   )
 }
 

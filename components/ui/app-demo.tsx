@@ -8,10 +8,12 @@ import { cn } from '@/lib/utils'
  * The real app, running.
  */
 export function AppDemo({ className }: { className?: string }) {
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [paused, setPaused] = useState(true)
 
   useEffect(() => {
+    const wrapper = wrapperRef.current
     const video = videoRef.current
     if (!video) return
 
@@ -22,16 +24,22 @@ export function AppDemo({ className }: { className?: string }) {
     video.addEventListener('pause', sync)
     sync()
 
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!prefersReduced) {
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let inView = true
+
+    if (!motionQuery.matches) {
       void video.play().then(sync, sync)
     }
 
-    // Resource optimization: Pause video playback when off-screen or tab hidden
+    // Resource optimization: Pause video playback and float animation when off-screen or tab hidden
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry) return
-        if (entry.isIntersecting && !prefersReduced) {
+        inView = entry.isIntersecting
+        if (wrapper) {
+          wrapper.dataset.inView = inView ? 'true' : 'false'
+        }
+        if (inView && !motionQuery.matches && !document.hidden) {
           void video.play().catch(() => {})
         } else {
           video.pause()
@@ -42,8 +50,13 @@ export function AppDemo({ className }: { className?: string }) {
     io.observe(video)
 
     const handleVisibility = () => {
+      if (wrapper) {
+        wrapper.dataset.paused = document.hidden ? 'true' : 'false'
+      }
       if (document.hidden) {
         video.pause()
+      } else if (inView && !motionQuery.matches) {
+        void video.play().catch(() => {})
       }
     }
     document.addEventListener('visibilitychange', handleVisibility)
@@ -61,12 +74,15 @@ export function AppDemo({ className }: { className?: string }) {
   // video fills that column with no side gap, and on small ones it simply
   // centres rather than growing into a full-width portrait wall.
   return (
-    <div className={cn('relative mx-auto w-full max-w-[330px] animate-float-hero transform-gpu', className)}>
+    <div
+      ref={wrapperRef}
+      className={cn('relative mx-auto w-full max-w-[330px] animate-float-hero transform-gpu', className)}
+    >
       {/* Soft emerald ambient backlight */}
       <div
         aria-hidden
         className="pointer-events-none absolute -inset-8 -z-10 rounded-[56px] bg-[radial-gradient(ellipse_at_center,rgba(24,201,100,0.22)_0%,rgba(6,78,59,0.12)_45%,transparent_72%)] opacity-80"
-        style={{ contain: 'paint', willChange: 'transform' }}
+        style={{ contain: 'paint' }}
       />
 
       <div className="relative overflow-hidden rounded-[34px] border border-white/15 bg-surface shadow-[0_50px_100px_-30px_rgba(0,0,0,0.95),0_0_35px_-8px_rgba(24,201,100,0.2)]">

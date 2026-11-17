@@ -12,85 +12,227 @@ const STALL_START = 0.6
 const STALL_END = 0.74
 
 const CYCLE_MS = 7500
+const PACKET_COUNT = 46
+
+type LaneRefs = {
+  track: HTMLDivElement | null
+  buffered: HTMLDivElement | null
+  playhead: HTMLDivElement | null
+  packets: (HTMLSpanElement | null)[]
+  delivered: boolean[]
+  width: number
+}
+
+function createLaneRefs(): LaneRefs {
+  return {
+    track: null,
+    buffered: null,
+    playhead: null,
+    packets: [],
+    delivered: Array.from({ length: PACKET_COUNT }, () => false),
+    width: 0,
+  }
+}
 
 /**
  * Side-by-side visualizer: a conventional lossy stream against Harmonia's
  * start-fast-then-upgrade adaptive pipeline.
  *
- * Runs on a 60 FPS requestAnimationFrame loop driven by elapsed time, ensuring
- * fluid playhead motion, glowing packet reveals, live bitrate climbing, and
- * active stall simulation.
+ * Drives playheads, buffered fills, packet reveals, and readouts directly via
+ * DOM refs in a viewport-gated requestAnimationFrame loop so 60 FPS motion
+ * produces zero per-frame React re-renders and zero layout thrashing.
  */
 export function PipelineVisualizer() {
-  const [progress, setProgress] = useState(0)
   const [playing, setPlaying] = useState(true)
-  const [isVisible, setIsVisible] = useState(false)
+  const [phase, setPhase] = useState({ upgraded: false, stalling: false })
+
   const containerRef = useRef<HTMLDivElement>(null)
+  const timeRef = useRef<HTMLSpanElement>(null)
+  const bitrateRef = useRef<HTMLSpanElement>(null)
+  const warnLaneRef = useRef<LaneRefs>(createLaneRefs())
+  const goodLaneRef = useRef<LaneRefs>(createLaneRefs())
+
   const progressRef = useRef(0)
-
-  // IntersectionObserver: only animate when in viewport
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry?.isIntersecting ?? false)
-      },
-      { threshold: 0.1 },
-    )
-    io.observe(el)
-
-    return () => io.disconnect()
-  }, [])
+  const lastPctTextRef = useRef(-1)
+  const lastBitrateRef = useRef(-1)
+  const phaseRef = useRef({ upgraded: false, stalling: false })
+  const isVisibleRef = useRef(false)
+  const reducedMotionRef = useRef(false)
 
   useEffect(() => {
-    if (!playing || !isVisible) return
+    const container = containerRef.current
+    if (!container) return
 
-    let animId: number
-    let lastTime = performance.now()
-    let lastRenderTime = 0
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    reducedMotionRef.current = motionQuery.matches
+    if (motionQuery.matches) {
+      progressRef.current = 0.5
+    }
 
-    const loop = (now: number) => {
-      const delta = now - lastTime
-      lastTime = now
+    const measureWidths = () => {
+      if (warnLaneRef.current.track) {
+        warnLaneRef.current.width = warnLaneRef.current.track.clientWidth
+      }
+      if (goodLaneRef.current.track) {
+        goodLaneRef.current.width = goodLaneRef.current.track.clientWidth
+      }
+    }
 
-      progressRef.current = (progressRef.current + delta / CYCLE_MS) % 1
-
-      // Throttle React renders to ~30 FPS (32ms) to save CPU/battery while CSS transitions keep visual motion at 60 FPS
-      if (now - lastRenderTime >= 32) {
-        lastRenderTime = now
-        setProgress(progressRef.current)
+    const paintLane = (
+      lane: LaneRefs,
+      laneProgress: number,
+      tone: 'warn' | 'good',
+    ) => {
+      if (lane.buffered) {
+        lane.buffered.style.transform = `scaleX(${laneProgress})`
+      }
+      if (lane.playhead && lane.width > 0) {
+        lane.playhead.style.transform = `translate3d(${(laneProgress * lane.width).toFixed(2)}px, 0, 0)`
       }
 
+      for (let i = 0; i < PACKET_COUNT; i++) {
+        const x = i / (PACKET_COUNT - 1)
+        const isDelivered = x <= laneProgress
+        if (lane.delivered[i] === isDelivered) continue
+
+        const el = lane.packets[i]
+        if (!el) continue
+        lane.delivered[i] = isDelivered
+
+        if (tone === 'warn') {
+          const inStall = x >= STALL_START && x < STALL_END
+          el.style.backgroundColor = isDelivered ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.06)'
+          el.style.opacity = isDelivered ? (inStall ? '0' : '0.9') : '0.35'
+        } else {
+          const isHq = x >= HANDOFF
+          el.style.backgroundColor = isDelivered
+            ? isHq
+              ? '#18C964'
+              : 'rgba(167, 243, 208, 0.65)'
+            : 'rgba(255,255,255,0.06)'
+          el.style.opacity = isDelivered ? (isHq ? '1' : '0.85') : '0.35'
+        }
+      }
+    }
+
+    const paintFrame = (p: number) => {
+      const upgraded = p >= HANDOFF
+      const stalling = p >= STALL_START && p < STALL_END
+
+      if (
+        phaseRef.current.upgraded !== upgraded ||
+        phaseRef.current.stalling !== stalling
+      ) {
+        phaseRef.current = { upgraded, stalling }
+        setPhase({ upgraded, stalling })
+      }
+
+      const pctInt = Math.floor(p * 100)
+      if (lastPctTextRef.current !== pctInt && timeRef.current) {
+        lastPctTextRef.current = pctInt
+        timeRef.current.textContent = `t = ${String(pctInt).padStart(2, '0')}%`
+      }
+
+      const ramp = Math.min(1, Math.max(0, (p - HANDOFF) / 0.05))
+      const bitrate = Math.round(160 + ramp * 160)
+      if (lastBitrateRef.current !== bitrate && bitrateRef.current) {
+        lastBitrateRef.current = bitrate
+        bitrateRef.current.textContent = `${bitrate} kbps`
+      }
+
+      const warnProgress = stalling ? STALL_START + (p - STALL_START) * 0.2 : p
+      paintLane(warnLaneRef.current, warnProgress, 'warn')
+      paintLane(goodLaneRef.current, p, 'good')
+    }
+
+    measureWidths()
+    paintFrame(progressRef.current)
+
+    const ro = new ResizeObserver(() => {
+      measureWidths()
+      paintFrame(progressRef.current)
+    })
+    if (warnLaneRef.current.track) ro.observe(warnLaneRef.current.track)
+    if (goodLaneRef.current.track) ro.observe(goodLaneRef.current.track)
+
+    let animId = 0
+    let lastTime = 0
+
+    const stopLoop = () => {
+      if (animId) {
+        cancelAnimationFrame(animId)
+        animId = 0
+      }
+    }
+
+    const loop = (now: number) => {
+      if (!playing || !isVisibleRef.current || document.hidden || reducedMotionRef.current) {
+        animId = 0
+        return
+      }
+      const delta = lastTime ? Math.min(100, now - lastTime) : 0
+      lastTime = now
+      progressRef.current = (progressRef.current + delta / CYCLE_MS) % 1
+      paintFrame(progressRef.current)
       animId = requestAnimationFrame(loop)
     }
 
+    const startLoop = () => {
+      if (animId || !playing || !isVisibleRef.current || document.hidden || reducedMotionRef.current) {
+        return
+      }
+      lastTime = performance.now()
+      animId = requestAnimationFrame(loop)
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const visible = entry?.isIntersecting ?? false
+        isVisibleRef.current = visible
+        container.dataset.inView = visible ? 'true' : 'false'
+        if (visible) {
+          measureWidths()
+          startLoop()
+        } else {
+          stopLoop()
+        }
+      },
+      { threshold: 0.05 },
+    )
+    io.observe(container)
+
     const onVisibilityChange = () => {
+      container.dataset.paused = document.hidden ? 'true' : 'false'
       if (document.hidden) {
-        cancelAnimationFrame(animId)
+        stopLoop()
       } else {
-        lastTime = performance.now()
-        animId = requestAnimationFrame(loop)
+        startLoop()
       }
     }
-
     document.addEventListener('visibilitychange', onVisibilityChange)
-    animId = requestAnimationFrame(loop)
+
+    const onMotionChange = (e: MediaQueryListEvent) => {
+      reducedMotionRef.current = e.matches
+      if (e.matches) {
+        stopLoop()
+        progressRef.current = 0.5
+        paintFrame(0.5)
+      } else {
+        startLoop()
+      }
+    }
+    motionQuery.addEventListener('change', onMotionChange)
 
     return () => {
-      cancelAnimationFrame(animId)
+      stopLoop()
+      io.disconnect()
+      ro.disconnect()
       document.removeEventListener('visibilitychange', onVisibilityChange)
+      motionQuery.removeEventListener('change', onMotionChange)
     }
-  }, [playing, isVisible])
+  }, [playing])
 
-  const upgraded = progress >= HANDOFF
-  const stalling = progress >= STALL_START && progress < STALL_END
-
-  // Bitrate readout: 160 kbps fast-start before handoff, 320 kbps JioSaavn HQ after,
-  // with a smooth ramp as it crosses the upgrade threshold.
-  const ramp = Math.min(1, Math.max(0, (progress - HANDOFF) / 0.05))
-  const bitrate = Math.round(160 + ramp * (320 - 160))
+  const { upgraded, stalling } = phase
 
   return (
     <div ref={containerRef} className="flex flex-col gap-3.5">
@@ -111,28 +253,32 @@ export function PipelineVisualizer() {
             <span>{playing ? 'Pause' : 'Play'}</span>
           </button>
 
-          <span className="font-mono text-[10px] tabular-nums uppercase tracking-[0.14em] text-white/40">
-            t = {(progress * 100).toFixed(0).padStart(2, '0')}%
+          <span
+            ref={timeRef}
+            className="font-mono text-[10px] tabular-nums uppercase tracking-[0.14em] text-white/40"
+          >
+            t = 00%
           </span>
         </div>
 
         {/* Live bitrate badge */}
-        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-3 py-1 backdrop-blur-md">
+        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/75 px-3 py-1">
           <span
             className={cn(
-              'size-1.5 rounded-full transition-all duration-300',
+              'size-1.5 rounded-full transition-colors duration-300',
               upgraded
                 ? 'bg-[#18C964] shadow-[0_0_10px_2px_rgba(24,201,100,0.8)]'
                 : 'bg-white/40',
             )}
           />
           <span
+            ref={bitrateRef}
             className={cn(
               'font-mono text-[11px] font-semibold tabular-nums transition-colors duration-200',
               upgraded ? 'text-[#18C964]' : 'text-white/80',
             )}
           >
-            {bitrate.toLocaleString('en-US')} kbps
+            160 kbps
           </span>
           <span className="font-mono text-[9.5px] uppercase tracking-wider text-white/40">
             {upgraded ? 'JioSaavn HQ' : 'Fast Start'}
@@ -142,22 +288,19 @@ export function PipelineVisualizer() {
 
       {/* ---------------------------- Lane 1: Conventional player ---------------------------- */}
       <Lane
+        laneRef={warnLaneRef}
         title="Conventional player"
         subtitle="One stream, one quality. Re-buffers when the pipe narrows."
         tone="warn"
-        progress={stalling ? STALL_START + (progress - STALL_START) * 0.2 : progress}
         badge={
           <span className="inline-flex items-center gap-1 rounded-md border border-line bg-white/[0.04] px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-wider text-white/45">
             128 kbps · locked
           </span>
         }
-        packets={(i, x) => {
+        packetHeight={(i, x) => {
           const inStall = x >= STALL_START && x < STALL_END
-          return {
-            opacity: inStall ? 0 : 0.9,
-            color: 'rgba(255,255,255,0.35)',
-            height: inStall ? 3 : 8 + (i % 3) * 3,
-          }
+          const h = inStall ? 3 : 8 + (i % 3) * 3
+          return Math.max(3, Math.round(h * 0.75))
         }}
         marker={
           <div
@@ -193,10 +336,10 @@ export function PipelineVisualizer() {
 
       {/* ---------------------------- Lane 2: Harmonia adaptive pipeline ---------------------------- */}
       <Lane
+        laneRef={goodLaneRef}
         title="Harmonia adaptive pipeline"
         subtitle="Checks local/offline storage, then resolves direct JioSaavn or YouTube Music with fast start."
         tone="good"
-        progress={progress}
         badge={
           <motion.span
             key={upgraded ? 'hq' : 'fast'}
@@ -204,7 +347,7 @@ export function PipelineVisualizer() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: 'spring', stiffness: 350, damping: 22 }}
             className={cn(
-              'inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-mono text-[9.5px] font-semibold uppercase tracking-wider transition-all duration-300',
+              'inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-mono text-[9.5px] font-semibold uppercase tracking-wider transition-colors duration-300',
               upgraded
                 ? 'border-[#18C964]/50 bg-[#18C964]/15 text-[#18C964] shadow-[0_0_12px_rgba(24,201,100,0.2)]'
                 : 'border-line bg-white/[0.04] text-white/55',
@@ -213,11 +356,10 @@ export function PipelineVisualizer() {
             {upgraded ? '320 kbps · JioSaavn HQ' : '160 kbps · Fast Start'}
           </motion.span>
         }
-        packets={(i, x) => ({
-          opacity: x >= HANDOFF ? 1 : 0.85,
-          color: x >= HANDOFF ? '#18C964' : 'rgba(167, 243, 208, 0.65)',
-          height: x >= HANDOFF ? 14 + (i % 3) * 4 : 8 + (i % 3) * 3,
-        })}
+        packetHeight={(i, x) => {
+          const h = x >= HANDOFF ? 14 + (i % 3) * 4 : 8 + (i % 3) * 3
+          return Math.max(3, Math.round(h * 0.75))
+        }}
         marker={
           <div
             className="absolute inset-y-0 flex items-center"
@@ -229,10 +371,10 @@ export function PipelineVisualizer() {
             {/* Prominent glowing Upgrade Pill Badge */}
             <div
               className={cn(
-                'ml-2 flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider transition-all duration-300',
+                'ml-2 flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider transition-[transform,background-color,color,box-shadow] duration-300',
                 upgraded
                   ? 'border border-[#18C964] bg-[#18C964] text-black shadow-[0_0_18px_rgba(24,201,100,0.95)] scale-105'
-                  : 'border border-[#18C964]/70 bg-[#0A110E]/95 text-[#18C964] shadow-[0_0_10px_rgba(24,201,100,0.4)] backdrop-blur-sm',
+                  : 'border border-[#18C964]/70 bg-[#0A110E]/95 text-[#18C964] shadow-[0_0_10px_rgba(24,201,100,0.4)]',
               )}
             >
               <Zap
@@ -243,7 +385,7 @@ export function PipelineVisualizer() {
                 aria-hidden
               />
               <span>Upgrade</span>
-              <span className="text-[8px] font-semibold opacity-80 hidden sm:inline">&bull; 320k</span>
+              <span className="hidden text-[8px] font-semibold opacity-80 sm:inline">&bull; 320k</span>
             </div>
           </div>
         }
@@ -269,26 +411,24 @@ export function PipelineVisualizer() {
  * Lane component representing an individual audio pipeline track.
  */
 function Lane({
+  laneRef,
   title,
   subtitle,
   tone,
-  progress,
   badge,
-  packets,
+  packetHeight,
   marker,
   status,
 }: {
+  laneRef: React.RefObject<LaneRefs>
   title: string
   subtitle: string
   tone: 'warn' | 'good'
-  progress: number
   badge: React.ReactNode
-  packets: (i: number, x: number) => { opacity: number; color: string; height: number }
+  packetHeight: (i: number, x: number) => number
   marker: React.ReactNode
   status: React.ReactNode
 }) {
-  const COUNT = 46
-
   return (
     <div
       className={cn(
@@ -307,14 +447,23 @@ function Lane({
       </div>
 
       {/* Packet track */}
-      <div className="relative h-9 overflow-hidden rounded-lg border border-white/[0.08] bg-black/50 sm:h-10">
-        {/* Buffered region behind the playhead */}
+      <div
+        ref={(el) => {
+          laneRef.current.track = el
+        }}
+        className="relative h-9 overflow-hidden rounded-lg border border-white/[0.08] bg-black/50 sm:h-10"
+        style={{ contain: 'layout paint' }}
+      >
+        {/* Buffered region behind the playhead (GPU scaleX) */}
         <div
+          ref={(el) => {
+            laneRef.current.buffered = el
+          }}
           className={cn(
-            'absolute inset-y-0 left-0 transition-none',
+            'absolute inset-0 origin-left will-change-transform',
             tone === 'good' ? 'bg-[#18C964]/10' : 'bg-white/[0.03]',
           )}
-          style={{ width: pct(progress) }}
+          style={{ transform: 'scaleX(0)' }}
         />
 
         {/* High-quality upgraded zone highlight for Harmonia */}
@@ -327,24 +476,22 @@ function Lane({
 
         {/* Packets layer */}
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-1.5">
-          {Array.from({ length: COUNT }, (_, i) => {
-            const x = i / (COUNT - 1)
-            const { opacity, color, height } = packets(i, x)
-            const delivered = x <= progress
+          {Array.from({ length: PACKET_COUNT }, (_, i) => {
+            const x = i / (PACKET_COUNT - 1)
+            const height = packetHeight(i, x)
 
             return (
               <span
                 key={i}
-                className="rounded-full transition-[height,background-color,box-shadow] duration-150"
+                ref={(el) => {
+                  laneRef.current.packets[i] = el
+                }}
+                className="rounded-full"
                 style={{
                   width: 3,
-                  height: Math.max(3, Math.round(height * 0.75)),
-                  backgroundColor: delivered ? color : 'rgba(255,255,255,0.06)',
-                  opacity: delivered ? opacity : 0.35,
-                  boxShadow:
-                    delivered && tone === 'good' && x >= HANDOFF
-                      ? '0 0 8px rgba(24, 201, 100, 0.6)'
-                      : undefined,
+                  height,
+                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  opacity: 0.35,
                 }}
               />
             )
@@ -352,19 +499,20 @@ function Lane({
         </div>
 
         {/* Lane markers (upgrade threshold / stall region) with highest contrast layer */}
-        <div className="pointer-events-none absolute inset-0 z-20">
-          {marker}
-        </div>
+        <div className="pointer-events-none absolute inset-0 z-20">{marker}</div>
 
-        {/* Playhead */}
+        {/* Playhead (GPU translate3d) */}
         <div
+          ref={(el) => {
+            laneRef.current.playhead = el
+          }}
           className={cn(
-            'pointer-events-none absolute inset-y-0 z-30 w-px transition-none',
+            'pointer-events-none absolute inset-y-0 left-0 z-30 w-px will-change-transform',
             tone === 'good'
               ? 'bg-[#18C964] shadow-[0_0_12px_2px_rgba(24,201,100,0.8)]'
               : 'bg-white/80 shadow-[0_0_10px_2px_rgba(255,255,255,0.4)]',
           )}
-          style={{ left: pct(progress) }}
+          style={{ transform: 'translate3d(0, 0, 0)' }}
         >
           <span
             className={cn(

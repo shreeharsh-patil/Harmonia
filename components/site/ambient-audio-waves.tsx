@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
+
 /**
  * AmbientAudioWaves
  *
@@ -13,10 +15,29 @@
  * - Soft mint (#A7F3D0)
  */
 export function AmbientAudioWaves() {
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        el.dataset.inView = entry?.isIntersecting ? 'true' : 'false'
+      },
+      { threshold: 0 },
+    )
+    io.observe(el)
+
+    return () => io.disconnect()
+  }, [])
+
   return (
     <div
+      ref={wrapperRef}
       aria-hidden
       className="pointer-events-none absolute -inset-x-12 -inset-y-16 -z-10 select-none overflow-visible opacity-75 sm:-inset-x-20 sm:-inset-y-24"
+      style={{ contain: 'layout style' }}
     >
       <svg
         viewBox="0 0 600 800"

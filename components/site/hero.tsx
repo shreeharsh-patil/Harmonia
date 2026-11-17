@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowDownToLine, ArrowUpRight, Github, History, Star } from 'lucide-react'
 import { FaAndroid, FaApple, FaTv, FaWindows } from 'react-icons/fa'
@@ -25,6 +26,30 @@ const PLATFORMS = [
 
 export function Hero() {
   const { data } = useTelemetry()
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        el.dataset.inView = entry?.isIntersecting ? 'true' : 'false'
+      },
+      { threshold: 0 },
+    )
+    io.observe(el)
+
+    const onVisibility = () => {
+      el.dataset.paused = document.hidden ? 'true' : 'false'
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    return () => {
+      io.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [])
 
   const latest = data?.latest ?? null
   const tag = latest?.tag
@@ -33,7 +58,7 @@ export function Hero() {
   const download = resolveDownload(latest)
 
   return (
-    <section id="top" className="relative overflow-hidden pb-20 pt-16 sm:pb-28 sm:pt-20">
+    <section ref={sectionRef} id="top" className="relative overflow-hidden pb-20 pt-16 sm:pb-28 sm:pt-20">
       {/*
         A film of noise, so the flat black has some tooth to it rather than
         reading as a dead void. The grid that used to sit here as well is gone:
@@ -54,7 +79,7 @@ export function Hero() {
           <Reveal>
             <a
               href="#changelog"
-              className="group inline-flex items-center gap-2.5 rounded-full border border-emerald-500/20 bg-[#0A110E]/80 backdrop-blur-md px-3.5 py-1.5 text-[12.5px] transition-all duration-300 hover:border-emerald-500/40 hover:bg-[#0A110E]"
+              className="group inline-flex items-center gap-2.5 rounded-full border border-emerald-500/20 bg-[#0A110E]/92 px-3.5 py-1.5 text-[12.5px] transition-[border-color,background-color] duration-300 hover:border-emerald-500/40 hover:bg-[#0A110E]"
             >
               <span className="relative flex size-2 shrink-0">
                 <span className="absolute inset-0 rounded-full bg-[#18C964]" />
@@ -77,7 +102,7 @@ export function Hero() {
             <h1 className="mt-7 max-w-[18ch] text-balance text-[2.6rem] font-extrabold leading-[1.02] tracking-[-0.045em] sm:text-6xl lg:text-[4.1rem]">
               <span className="text-[#F5F7F5]">Free Music.</span>
               <br />
-              <span className="animate-headline-flow inline-block bg-gradient-to-r from-[#F5F7F5] via-[#D1D5DB] via-[#A7F3D0]/60 to-[#717A75] bg-clip-text text-transparent">
+              <span className="animate-headline-flow inline-block bg-gradient-to-r from-[#F5F7F5] via-[#A7F3D0]/70 to-[#717A75] bg-clip-text text-transparent">
                 Zero Subscriptions.
               </span>
             </h1>
@@ -158,9 +183,9 @@ export function Hero() {
                 <li
                   key={name}
                   className={cn(
-                    'flex items-center gap-3 rounded-2xl border px-4 py-3.5 transition-all duration-300',
+                    'flex items-center gap-3 rounded-2xl border px-4 py-3.5 transition-[transform,border-color,box-shadow] duration-300',
                     shipped
-                      ? 'border-[#18C964]/30 bg-[#0A110E]/90 hover:border-[#18C964]/60 hover:shadow-[0_0_20px_-6px_rgba(24,201,100,0.25)] hover:-translate-y-0.5'
+                      ? 'border-[#18C964]/30 bg-[#0A110E]/92 hover:border-[#18C964]/60 hover:shadow-[0_0_20px_-6px_rgba(24,201,100,0.25)] hover:-translate-y-0.5'
                       : 'border-line bg-transparent hover:border-white/20',
                   )}
                 >

@@ -41,7 +41,7 @@ export function Nav() {
       {/* Scroll progress — full-bleed, pinned to the top of the viewport. */}
       <motion.span
         aria-hidden
-        className="fixed inset-x-0 top-0 z-[60] h-[2px] bg-white/80"
+        className="fixed inset-x-0 top-0 z-[60] h-[2px] bg-white/80 will-change-transform"
         style={{ scaleX: scrollYProgress, transformOrigin: '0% 50%' }}
       />
 
@@ -62,7 +62,7 @@ export function Nav() {
               rel="noopener noreferrer"
               // No resting fill: the header is fully transparent, so the only
               // thing separating this control from the page is its hairline.
-              className="group inline-flex items-center gap-2 rounded-full border border-line px-3 py-2 text-[13px] text-white/75 transition-all duration-300 hover:bg-white/[0.07] hover:text-white"
+              className="group inline-flex items-center gap-2 rounded-full border border-line px-3 py-2 text-[13px] text-white/75 transition-colors duration-300 hover:bg-white/[0.07] hover:text-white"
             >
               <Star
                 className="size-3.5 text-white/70 transition-transform duration-300 group-hover:scale-110 group-hover:fill-white"

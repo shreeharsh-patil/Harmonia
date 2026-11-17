@@ -47,12 +47,12 @@ export function ReplayCard() {
             <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/40">Offline Cache</span>
             <span className="font-mono text-[9.5px] text-[#18C964]">1.2 GB / 8.0 GB</span>
           </div>
-          {/* Animated storage bar */}
+          {/* Animated storage bar (GPU scaleX) */}
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[#18C964] via-[#A7F3D0] to-[#18C964]"
-              initial={{ width: 0 }}
-              whileInView={{ width: '35%' }}
+              className="h-full w-full origin-left rounded-full bg-gradient-to-r from-[#18C964] via-[#A7F3D0] to-[#18C964]"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 0.35 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, ease: 'easeOut' }}
             />
@@ -67,7 +67,7 @@ export function ReplayCard() {
         {ROWS.map((row, i) => (
           <motion.div
             key={row.title}
-            className="group/row flex cursor-default items-center gap-2.5 rounded-lg border border-line bg-white/[0.02] px-2.5 py-2 transition-all duration-200 hover:border-[#18C964]/40 hover:bg-[#18C964]/[0.05] hover:translate-x-1"
+            className="group/row flex cursor-default items-center gap-2.5 rounded-lg border border-line bg-white/[0.02] px-2.5 py-2 transition-[transform,border-color,background-color] duration-200 hover:border-[#18C964]/40 hover:bg-[#18C964]/[0.05] hover:translate-x-1"
             initial={{ opacity: 0, x: -8 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}

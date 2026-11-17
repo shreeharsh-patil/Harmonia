@@ -8,9 +8,9 @@ type Variant = 'primary' | 'secondary' | 'ghost'
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    'bg-[#F5F7F5] text-[#050807] font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_25px_-5px_rgba(255,255,255,0.22)] active:translate-y-0',
+    'bg-[#F5F7F5] text-[#050807] font-semibold transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_25px_-5px_rgba(255,255,255,0.22)] active:translate-y-0',
   secondary:
-    'bg-[#0A110E]/80 backdrop-blur-md border border-white/10 text-[#F5F7F5]/90 transition-all duration-200 hover:border-[#18C964]/40 hover:bg-[#18C964]/[0.06] hover:text-[#F5F7F5] hover:shadow-[0_0_24px_-4px_rgba(24,201,100,0.18)]',
+    'bg-[#0A110E]/92 border border-white/10 text-[#F5F7F5]/90 transition-[background-color,border-color,color,box-shadow] duration-200 hover:border-[#18C964]/40 hover:bg-[#18C964]/[0.08] hover:text-[#F5F7F5] hover:shadow-[0_0_24px_-4px_rgba(24,201,100,0.18)]',
   ghost:
     'text-white/60 hover:text-white hover:bg-white/[0.05] transition-colors duration-200',
 }
@@ -43,6 +43,7 @@ export function MagneticButton({
   'aria-label': ariaLabel,
 }: MagneticButtonProps) {
   const wrapRef = useRef<HTMLSpanElement>(null)
+  const rectRef = useRef<{ left: number; top: number; width: number; height: number } | null>(null)
   const [hovered, setHovered] = useState(false)
 
   // Magnet offset.
@@ -56,10 +57,20 @@ export function MagneticButton({
     variant === 'primary' ? 'rgba(0,0,0,0.16)' : 'rgba(255,255,255,0.14)'
   }, transparent 70%)`
 
-  function handleMove(e: React.PointerEvent<HTMLSpanElement>) {
+  function handleEnter(e: React.PointerEvent<HTMLSpanElement>) {
+    if (e.pointerType === 'touch') return
     const el = wrapRef.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
+    if (el) {
+      const r = el.getBoundingClientRect()
+      rectRef.current = { left: r.left, top: r.top, width: r.width, height: r.height }
+    }
+    setHovered(true)
+  }
+
+  function handleMove(e: React.PointerEvent<HTMLSpanElement>) {
+    if (e.pointerType === 'touch') return
+    const rect = rectRef.current
+    if (!rect || rect.width === 0 || rect.height === 0) return
     const localX = e.clientX - rect.left
     const localY = e.clientY - rect.top
 
@@ -75,6 +86,7 @@ export function MagneticButton({
   }
 
   function handleLeave() {
+    rectRef.current = null
     setHovered(false)
     px.set(-200)
     py.set(-200)
@@ -84,7 +96,7 @@ export function MagneticButton({
 
   const surface = cn(
     'group/btn relative z-10 inline-flex items-center justify-center gap-2 overflow-hidden rounded-full',
-    'px-6 py-3 text-sm transition-colors duration-300 select-none w-full h-full',
+    'px-6 py-3 text-sm select-none w-full h-full',
     'focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/80',
     VARIANTS[variant],
     className,
@@ -129,20 +141,24 @@ export function MagneticButton({
       className="relative inline-flex isolate"
       style={{ x, y }}
       onPointerMove={handleMove}
-      onPointerEnter={() => setHovered(true)}
+      onPointerEnter={handleEnter}
       onPointerLeave={handleLeave}
       whileTap={{ scale: 0.97 }}
     >
-      {/* Ambient halo behind the primary CTA — pure luminance, no hue. */}
+      {/* Ambient halo behind the primary CTA — radial gradient, zero filter blur cost. */}
       {variant === 'primary' ? (
         <span
           aria-hidden
           className={cn(
-            'pointer-events-none absolute -inset-[7px] rounded-full bg-white blur-lg transition-opacity duration-500',
+            'pointer-events-none absolute -inset-3 rounded-full transition-opacity duration-500',
             // Driven by state, not `group-hover:`: the pointer handlers live on
             // this wrapper, and there is no `group` ancestor to hover.
-            hovered ? 'opacity-30' : 'opacity-[0.14]',
+            hovered ? 'opacity-40' : 'opacity-20',
           )}
+          style={{
+            background:
+              'radial-gradient(ellipse at center, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.12) 48%, transparent 72%)',
+          }}
         />
       ) : null}
       {control}

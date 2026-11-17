@@ -22,16 +22,32 @@ export function PresenceCard() {
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
-    const io = new IntersectionObserver(([entry]) => setIsVisible(entry?.isIntersecting ?? false), {
-      threshold: 0.1,
-    })
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const visible = entry?.isIntersecting ?? false
+        el.dataset.inView = visible ? 'true' : 'false'
+        setIsVisible(visible)
+      },
+      { threshold: 0.1 },
+    )
     io.observe(el)
-    return () => io.disconnect()
+
+    const onVisibility = () => {
+      el.dataset.paused = document.hidden ? 'true' : 'false'
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    return () => {
+      io.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
   }, [])
 
   useEffect(() => {
     if (!isVisible) return
-    const id = window.setInterval(() => setElapsed((s) => (s + 1) % 600), 1000)
+    const id = window.setInterval(() => {
+      if (!document.hidden) setElapsed((s) => (s + 1) % 600)
+    }, 1000)
     return () => window.clearInterval(id)
   }, [isVisible])
 
@@ -41,7 +57,7 @@ export function PresenceCard() {
   return (
     <div ref={containerRef} className="flex h-full flex-col gap-3.5">
       {/* Media notification card */}
-      <div className="rounded-xl border border-white/[0.08] bg-[#1c1c1e]/85 p-3.5 backdrop-blur-xl">
+      <div className="rounded-xl border border-white/[0.08] bg-[#1c1c1e]/95 p-3.5">
         <div className="mb-2.5 flex items-center justify-between">
           <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/40">
             Playing on Harmonia Mobile
@@ -76,12 +92,12 @@ export function PresenceCard() {
             <p className="truncate text-[11px] text-white/55">Direct Stream · JioSaavn HQ</p>
             <p className="truncate text-[11px] text-white/40">320 kbps High Fidelity</p>
 
-            {/* Elapsed bar */}
+            {/* Elapsed bar (GPU scaleX) */}
             <div className="mt-1.5 flex items-center gap-1.5">
               <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/12">
                 <div
-                  className="h-full rounded-full bg-white/70 transition-[width] duration-1000 ease-linear"
-                  style={{ width: pct(elapsed / 600) }}
+                  className="h-full w-full origin-left rounded-full bg-white/70 transition-transform duration-1000 ease-linear will-change-transform"
+                  style={{ transform: `scaleX(${(elapsed / 600).toFixed(4)})` }}
                 />
               </div>
               <span className="font-mono text-[9px] tabular-nums text-white/45">

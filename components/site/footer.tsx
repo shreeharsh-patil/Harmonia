@@ -113,7 +113,7 @@ export function Footer() {
                       {link.label}
                       {'external' in link && link.external ? (
                         <ArrowUpRight
-                          className="size-3 opacity-0 transition-all duration-300 group-hover:opacity-60"
+                          className="size-3 opacity-0 transition-opacity duration-300 group-hover:opacity-60"
                           aria-hidden
                         />
                       ) : null}

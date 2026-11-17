@@ -222,22 +222,39 @@ export function LyricsCard() {
         const track = trackRef.current
         const top = offsets.current[active]
         if (track && top !== undefined) {
-          track.style.transform = `translateY(${FOCUS_TOP - top}px)`
+          track.style.transform = `translate3d(0, ${FOCUS_TOP - top}px, 0)`
         }
       }
     }
 
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let elapsedOffset = 0
+
+    function stopLoop() {
+      if (raf) {
+        cancelAnimationFrame(raf)
+        raf = 0
+      }
+      if (start) {
+        elapsedOffset = (elapsedOffset + (performance.now() - start)) % TOTAL_MS
+        start = 0
+      }
+    }
+
     function frame(now: number) {
-      // Re-queue first and bail second. The loop must not be the thing that
-      // stops, because the only event that could restart it is an
-      // IntersectionObserver callback — and those are not delivered while the
-      // page is not being rendered. Stopping the loop on an off-screen entry
-      // and waiting for a callback that never came is exactly how this card
-      // ended up frozen on its first frame, every character still unsung.
-      raf = requestAnimationFrame(frame)
-      if (!onScreen) return
+      if (!onScreen || document.hidden || motionQuery.matches) {
+        raf = 0
+        return
+      }
       if (!start) start = now
-      paint((now - start) % TOTAL_MS)
+      paint((elapsedOffset + (now - start)) % TOTAL_MS)
+      raf = requestAnimationFrame(frame)
+    }
+
+    function startLoop() {
+      if (raf || !onScreen || document.hidden || motionQuery.matches) return
+      start = performance.now()
+      raf = requestAnimationFrame(frame)
     }
 
     /**
@@ -252,25 +269,54 @@ export function LyricsCard() {
     }
     measure.current()
 
-    const onResize = () => measure.current()
-    window.addEventListener('resize', onResize)
+    const ro = new ResizeObserver(() => measure.current())
+    if (stageRef.current) ro.observe(stageRef.current)
 
-    // Skip the work while the card is off screen. A frame that early-returns
-    // costs nothing; the browser already throttles rAF in background tabs.
+    // True viewport gating: stop rAF completely when off-screen or hidden.
     const io = new IntersectionObserver(
       ([entry]) => {
-        onScreen = entry?.isIntersecting ?? true
+        onScreen = entry?.isIntersecting ?? false
+        if (onScreen) {
+          startLoop()
+        } else {
+          stopLoop()
+        }
       },
       { threshold: 0 },
     )
     if (stageRef.current) io.observe(stageRef.current)
 
-    raf = requestAnimationFrame(frame)
+    const onVisibility = () => {
+      if (document.hidden) {
+        stopLoop()
+      } else {
+        startLoop()
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    const onMotionChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        stopLoop()
+        paint(LINES[1]?.timeMs ? LINES[1].timeMs + 650 : 1200)
+      } else {
+        startLoop()
+      }
+    }
+    motionQuery.addEventListener('change', onMotionChange)
+
+    if (motionQuery.matches) {
+      paint(LINES[1]?.timeMs ? LINES[1].timeMs + 650 : 1200)
+    } else {
+      startLoop()
+    }
 
     return () => {
-      cancelAnimationFrame(raf)
+      stopLoop()
       io.disconnect()
-      window.removeEventListener('resize', onResize)
+      ro.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+      motionQuery.removeEventListener('change', onMotionChange)
     }
   }, [])
 
@@ -314,6 +360,7 @@ export function LyricsCard() {
       <div
         ref={stageRef}
         className="relative h-[212px] shrink-0 overflow-hidden rounded-xl border border-line bg-black/35 px-4"
+        style={{ contain: 'layout paint style' }}
       >
         <div
           ref={trackRef}
@@ -328,7 +375,7 @@ export function LyricsCard() {
               }}
               className="origin-left py-[9px]"
               style={{
-                transition: `opacity ${LYRIC_SETTLE_MS}ms ${LYRIC_EASING}, filter ${LYRIC_SETTLE_MS}ms ${LYRIC_EASING}, transform ${LYRIC_SETTLE_MS}ms ${LYRIC_EASING}`,
+                transition: `opacity ${LYRIC_SETTLE_MS}ms ${LYRIC_EASING}, transform ${LYRIC_SETTLE_MS}ms ${LYRIC_EASING}`,
               }}
             >
               {/* `text-white/45` is the unsung baseline, so the line looks

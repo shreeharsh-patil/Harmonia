@@ -20,6 +20,7 @@ export function GlassCard({
   interactive?: boolean
 }) {
   const ref = useRef<HTMLDivElement>(null)
+  const rectRef = useRef<{ left: number; top: number } | null>(null)
   const [isHovered, setIsHovered] = useState(false)
   const x = useMotionValue(-400)
   const y = useMotionValue(-400)
@@ -28,17 +29,27 @@ export function GlassCard({
   const edge = useMotionTemplate`radial-gradient(320px circle at ${x}px ${y}px, rgba(24,201,100,0.55), rgba(255,255,255,0.3) 45%, transparent 75%)`
 
   function onMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (!interactive) return
-    x.set(e.nativeEvent.offsetX)
-    y.set(e.nativeEvent.offsetY)
+    if (!interactive || e.pointerType === 'touch') return
+    const rect = rectRef.current
+    if (!rect) return
+    x.set(e.clientX - rect.left)
+    y.set(e.clientY - rect.top)
   }
 
-  function onEnter() {
-    if (!interactive) return
+  function onEnter(e: React.PointerEvent<HTMLDivElement>) {
+    if (!interactive || e.pointerType === 'touch') return
+    const el = ref.current
+    if (el) {
+      const r = el.getBoundingClientRect()
+      rectRef.current = { left: r.left, top: r.top }
+      x.set(e.clientX - r.left)
+      y.set(e.clientY - r.top)
+    }
     setIsHovered(true)
   }
 
   function onLeave() {
+    rectRef.current = null
     setIsHovered(false)
     x.set(-400)
     y.set(-400)
@@ -50,9 +61,10 @@ export function GlassCard({
       onPointerEnter={onEnter}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
+      style={{ contain: 'layout style' }}
       className={cn(
         'group/card relative overflow-hidden rounded-[22px] glass',
-        'transition-all duration-300 [transition-timing-function:var(--ease-out-expo)]',
+        'transition-[transform,border-color,box-shadow] duration-300 [transition-timing-function:var(--ease-out-expo)]',
         interactive && 'hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_20px_50px_-20px_rgba(24,201,100,0.18)]',
         className,
       )}
@@ -63,7 +75,6 @@ export function GlassCard({
           aria-hidden
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           className="pointer-events-none absolute inset-0 z-0"
           style={{ background: wash }}
@@ -76,7 +87,6 @@ export function GlassCard({
           aria-hidden
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           className="pointer-events-none absolute inset-0 z-0 rounded-[22px]"
           style={{

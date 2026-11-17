@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Activity, Disc3 } from 'lucide-react'
 import { pct } from '@/lib/utils'
@@ -34,7 +34,33 @@ const IN_BPM = 128
  */
 export function AutomixCard() {
   const [seconds, setSeconds] = useState(6)
+  const [isVisible, setIsVisible] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
   const sliderId = useId()
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const visible = entry?.isIntersecting ?? false
+        el.dataset.inView = visible ? 'true' : 'false'
+        setIsVisible(visible)
+      },
+      { threshold: 0.05 },
+    )
+    io.observe(el)
+
+    const onVisibility = () => {
+      el.dataset.paused = document.hidden ? 'true' : 'false'
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    return () => {
+      io.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [])
 
   // Overlap as a fraction of the lane width. 12s maps to ~46% overlap, which is
   // as far as it can go before the two waveforms become unreadable.
@@ -42,7 +68,7 @@ export function AutomixCard() {
   const beatMatched = seconds > 0
 
   return (
-    <div className="flex h-full flex-col gap-4">
+    <div ref={containerRef} className="flex h-full flex-col gap-4">
       {/* BPM handoff */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -50,13 +76,19 @@ export function AutomixCard() {
           <span className="font-mono text-[11px] tabular-nums text-white/80">{OUT_BPM} BPM</span>
         </div>
 
-        <div className="relative flex-1">
+        <div className="relative flex-1 overflow-hidden py-1">
           <div className="h-px w-full bg-gradient-to-r from-[#18C964]/40 via-white/50 to-[#18C964]/40" />
-          <motion.span
-            className="absolute -top-[3px] size-1.5 rounded-full bg-[#18C964] shadow-[0_0_10px_2px_rgba(24,201,100,0.7)]"
-            animate={{ left: ['0%', '100%'] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          />
+          <motion.div
+            className="pointer-events-none absolute inset-y-0 left-0 right-1.5 flex items-center will-change-transform"
+            animate={isVisible ? { x: ['0%', '100%'] } : { x: '50%' }}
+            transition={
+              isVisible
+                ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }
+                : { duration: 0 }
+            }
+          >
+            <span className="size-1.5 rounded-full bg-[#18C964] shadow-[0_0_10px_2px_rgba(24,201,100,0.7)]" />
+          </motion.div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -66,16 +98,19 @@ export function AutomixCard() {
       </div>
 
       {/* Overlapping waveforms */}
-      <div className="relative h-24 overflow-hidden rounded-xl border border-white/[0.08] bg-black/45">
+      <div
+        className="relative h-24 overflow-hidden rounded-xl border border-white/[0.08] bg-black/45"
+        style={{ contain: 'layout paint' }}
+      >
         {/* Outgoing track, anchored left */}
         <div
-          className="absolute inset-y-0 left-0 flex items-center gap-[2px] px-2 transition-all duration-300"
+          className="absolute inset-y-0 left-0 flex items-center gap-[2px] px-2 transition-[width] duration-300"
           style={{ width: pct(0.5 + overlap / 2) }}
         >
           {OUTGOING.map((h, i) => (
             <span
               key={i}
-              className="flex-1 rounded-full bg-gradient-to-t from-white/20 via-white/50 to-white/90 transition-all duration-200"
+              className="flex-1 rounded-full bg-gradient-to-t from-white/20 via-white/50 to-white/90"
               style={{ height: pct(h * 0.66) }}
             />
           ))}
@@ -83,13 +118,13 @@ export function AutomixCard() {
 
         {/* Incoming track, anchored right */}
         <div
-          className="absolute inset-y-0 right-0 flex items-end justify-end gap-[2px] px-2 pb-2 transition-all duration-300"
+          className="absolute inset-y-0 right-0 flex items-end justify-end gap-[2px] px-2 pb-2 transition-[width] duration-300"
           style={{ width: pct(0.5 + overlap / 2) }}
         >
           {INCOMING.map((h, i) => (
             <span
               key={i}
-              className="flex-1 rounded-full bg-gradient-to-t from-[#18C964] via-[#18C964]/70 to-[#064E3B]/40 transition-all duration-200"
+              className="flex-1 rounded-full bg-gradient-to-t from-[#18C964] via-[#18C964]/70 to-[#064E3B]/40"
               style={{ height: pct(h * 0.58) }}
             />
           ))}
@@ -97,7 +132,7 @@ export function AutomixCard() {
 
         {/* Transition window with glowing emerald boundary */}
         <motion.div
-          className="absolute inset-y-0 border-x border-dashed border-[#18C964]/60 bg-[#18C964]/[0.08] shadow-[0_0_15px_rgba(24,201,100,0.12)] backdrop-blur-[1px]"
+          className="absolute inset-y-0 border-x border-dashed border-[#18C964]/60 bg-[#18C964]/[0.08] shadow-[0_0_15px_rgba(24,201,100,0.12)]"
           animate={{
             left: pct(0.5 - overlap / 2),
             width: pct(overlap),
