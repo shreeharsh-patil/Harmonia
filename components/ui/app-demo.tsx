@@ -76,7 +76,7 @@ export function AppDemo({ className }: { className?: string }) {
   return (
     <div
       ref={wrapperRef}
-      className={cn('relative mx-auto w-full max-w-[330px] animate-float-hero transform-gpu', className)}
+      className={cn('relative mx-auto w-full max-w-[330px] transform-gpu', className)}
     >
       {/* Soft emerald ambient backlight */}
       <div
