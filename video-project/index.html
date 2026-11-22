@@ -1,0 +1,152 @@
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"accent","type":"color","label":"Accent Color","default":"#18C964"},
+    {"id":"ctaText","type":"string","label":"End Card CTA","default":"Download Latest APK"},
+    {"id":"ctaUrl","type":"string","label":"Site URL","default":"listenharmonia.vercel.app"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Harmonia Mobile — Promotional Film</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --ground: #060b09;
+        --surface: #0d1713;
+        --ink: #f5f7f5;
+        --ink-muted: #9ca8a1;
+        --accent: #18c964;
+        --font-display: 'Inter', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--ground);
+        font-family: var(--font-display);
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--ground);
+      }
+      #film-backdrop {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 18%, rgba(24, 201, 100, 0.14) 0%, #060b09 64%);
+        z-index: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="28"
+      data-width="1080"
+      data-height="1920"
+      data-motion-blur="on"
+    >
+      <div id="film-backdrop" data-layout-ignore></div>
+
+      <div
+        id="scene-hook"
+        data-composition-id="scene-hook"
+        data-composition-src="compositions/scene-hook.html"
+        data-start="0"
+        data-duration="4.95"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 10"
+      ></div>
+
+      <div
+        id="scene-search"
+        data-composition-id="scene-search"
+        data-composition-src="compositions/scene-search.html"
+        data-start="4.5"
+        data-duration="5.45"
+        data-track-index="2"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 20"
+      ></div>
+
+      <div
+        id="scene-player"
+        data-composition-id="scene-player"
+        data-composition-src="compositions/scene-player.html"
+        data-start="9.5"
+        data-duration="5.95"
+        data-track-index="3"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 30"
+      ></div>
+
+      <div
+        id="scene-lyrics"
+        data-composition-id="scene-lyrics"
+        data-composition-src="compositions/scene-lyrics.html"
+        data-start="15"
+        data-duration="5.95"
+        data-track-index="4"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 40"
+      ></div>
+
+      <div
+        id="scene-library"
+        data-composition-id="scene-library"
+        data-composition-src="compositions/scene-library.html"
+        data-start="20.5"
+        data-duration="4.5"
+        data-track-index="5"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 50"
+      ></div>
+
+      <div
+        id="scene-endcard"
+        data-composition-id="scene-endcard"
+        data-composition-src="compositions/scene-endcard.html"
+        data-start="24.5"
+        data-duration="3.5"
+        data-track-index="6"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 60"
+      ></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const mainTl = gsap.timeline({ paused: true });
+      window.__timelines["main"] = mainTl;
+      mainTl.seek(0);
+    </script>
+  </body>
+</html>
