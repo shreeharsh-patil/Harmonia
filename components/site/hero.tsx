@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowDownToLine, ArrowUpRight, Github, History, Star } from 'lucide-react'
-import { FaAndroid, FaApple, FaTv, FaWindows } from 'react-icons/fa'
 import { AppDemo } from '@/components/ui/app-demo'
 import { AmbientAudioWaves } from '@/components/site/ambient-audio-waves'
 import { MagneticButton } from '@/components/ui/magnetic-button'
@@ -12,17 +11,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Reveal } from '@/components/ui/reveal'
 import { useTelemetry } from '@/components/telemetry-provider'
 import { REPO_URL, resolveDownload } from '@/lib/github'
-import { cn } from '@/lib/utils'
-
-/**
- * Where Harmonia Mobile runs, and where it is going.
- */
-const PLATFORMS = [
-  { name: 'Android', status: 'Available now', shipped: true, icon: FaAndroid },
-  { name: 'iOS', status: 'In development', shipped: false, icon: FaApple },
-  { name: 'Android TV', status: 'Planned', shipped: false, icon: FaTv },
-  { name: 'Windows', status: 'Planned', shipped: false, icon: FaWindows },
-] as const
 
 export function Hero() {
   const { data } = useTelemetry()
@@ -58,7 +46,7 @@ export function Hero() {
   const download = resolveDownload(latest)
 
   return (
-    <section ref={sectionRef} id="top" className="relative overflow-hidden pb-20 pt-16 sm:pb-28 sm:pt-20">
+    <section ref={sectionRef} id="top" className="relative overflow-hidden pb-12 pt-12 sm:pb-16 sm:pt-16">
       {/*
         A film of noise, so the flat black has some tooth to it rather than
         reading as a dead void. The grid that used to sit here as well is gone:
@@ -72,7 +60,7 @@ export function Hero() {
 
       {/* The demo column is sized to the video, not the other way round, so the
           video fills it with no side gap at either breakpoint. */}
-      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,330px)] lg:gap-14">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-9 px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,330px)] lg:gap-14">
         {/* ------------------------------ copy ------------------------------ */}
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           {/* Announcement pill */}
@@ -110,8 +98,8 @@ export function Hero() {
 
           {/* Sub-headline */}
           <Reveal delay={0.16}>
-            <p className="mt-6 max-w-xl text-pretty text-[15px] leading-[1.7] text-[#929B96] sm:text-[16.5px]">
-              The source-available music player for Android with free streaming from JioSaavn & YouTube Music, LRCLib synced lyrics, offline downloads, and native background playback.
+            <p className="mt-6 max-w-xl text-pretty text-base leading-[1.7] text-[#A7B0AB] sm:text-[17px]">
+              Play from JioSaavn and YouTube Music, follow synced lyrics, keep tracks offline, and listen in the background — all in one source-available Android player.
             </p>
           </Reveal>
 
@@ -153,7 +141,7 @@ export function Hero() {
 
           {/* Tertiary CTA + trust line */}
           <Reveal delay={0.32}>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-3 lg:justify-start">
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-3 lg:justify-start">
               <a
                 href={REPO_URL}
                 target="_blank"
@@ -170,51 +158,12 @@ export function Hero() {
 
               <span className="hidden h-3 w-px bg-white/10 sm:block" aria-hidden />
 
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/30">
+            <p className="font-mono text-xs uppercase tracking-[0.12em] text-white/40">
                 Android 8.0+ · Free providers · No ads · No Spotify keys
               </p>
             </div>
           </Reveal>
 
-          {/* Platform availability */}
-          <Reveal delay={0.4} className="w-full">
-            <ul className="mx-auto mt-8 grid w-full max-w-[520px] grid-cols-2 gap-2.5 lg:mx-0">
-              {PLATFORMS.map(({ name, status, shipped, icon: Icon }) => (
-                <li
-                  key={name}
-                  className={cn(
-                    'flex items-center gap-3 rounded-2xl border px-4 py-3.5 transition-[transform,border-color,box-shadow] duration-300',
-                    shipped
-                      ? 'border-[#18C964]/30 bg-[#0A110E]/92 hover:border-[#18C964]/60 hover:shadow-[0_0_20px_-6px_rgba(24,201,100,0.25)] hover:-translate-y-0.5'
-                      : 'border-line bg-transparent hover:border-white/20',
-                  )}
-                >
-                  <Icon
-                    className={cn('size-6 shrink-0 transition-colors', shipped ? 'text-[#18C964]' : 'text-white/35')}
-                    aria-hidden
-                  />
-                  <span className="flex min-w-0 flex-col leading-tight">
-                    <span
-                      className={cn(
-                        'truncate text-[14.5px] font-semibold',
-                        shipped ? 'text-white' : 'text-white/55',
-                      )}
-                    >
-                      {name}
-                    </span>
-                    <span
-                      className={cn(
-                        'mt-0.5 font-mono text-[9.5px] uppercase tracking-[0.14em]',
-                        shipped ? 'text-[#18C964]' : 'text-white/35',
-                      )}
-                    >
-                      {status}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
         </div>
 
         {/* ----------------------------- showcase ---------------------------- */}

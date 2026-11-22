@@ -93,11 +93,11 @@ export function Install() {
                       {step.title}
                     </h3>
 
-                    <p className="mt-2.5 text-pretty text-[13.5px] leading-relaxed text-white/45">
+                    <p className="mt-2.5 text-pretty text-[15px] leading-relaxed text-white/55 sm:text-base">
                       {step.body}
                     </p>
 
-                    <p className="mt-auto pt-5 font-mono text-[10px] uppercase leading-relaxed tracking-[0.1em] text-white/25">
+                    <p className="mt-auto pt-5 font-mono text-xs uppercase leading-relaxed tracking-[0.08em] text-white/40">
                       {step.detail}
                     </p>
 
