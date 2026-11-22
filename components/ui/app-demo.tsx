@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Play } from 'lucide-react'
+import { Pause, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /**
@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 export function AppDemo({ className }: { className?: string }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const manuallyPausedRef = useRef(false)
   const [paused, setPaused] = useState(true)
 
   useEffect(() => {
@@ -39,7 +40,7 @@ export function AppDemo({ className }: { className?: string }) {
         if (wrapper) {
           wrapper.dataset.inView = inView ? 'true' : 'false'
         }
-        if (inView && !motionQuery.matches && !document.hidden) {
+        if (inView && !motionQuery.matches && !document.hidden && !manuallyPausedRef.current) {
           void video.play().catch(() => {})
         } else {
           video.pause()
@@ -55,7 +56,7 @@ export function AppDemo({ className }: { className?: string }) {
       }
       if (document.hidden) {
         video.pause()
-      } else if (inView && !motionQuery.matches) {
+      } else if (inView && !motionQuery.matches && !manuallyPausedRef.current) {
         void video.play().catch(() => {})
       }
     }
@@ -100,7 +101,6 @@ export function AppDemo({ className }: { className?: string }) {
           loop
           muted
           playsInline
-          autoPlay
           preload="metadata"
           aria-label="Harmonia Mobile playing audio with synchronized lyrics and responsive mobile UI"
           className="block w-full"
@@ -114,13 +114,31 @@ export function AppDemo({ className }: { className?: string }) {
       {paused ? (
         <button
           type="button"
-          onClick={() => void videoRef.current?.play()}
+          onClick={() => {
+            manuallyPausedRef.current = false
+            void videoRef.current?.play().catch(() => {})
+          }}
           className="absolute inset-0 grid place-items-center rounded-[34px] bg-black/35 transition-colors hover:bg-black/25"
           aria-label="Play the Harmonia Mobile demo"
         >
           <span className="grid size-14 place-items-center rounded-full bg-white text-canvas shadow-[0_8px_30px_-6px_rgba(0,0,0,0.6)]">
             <Play className="ml-0.5 size-5 fill-current" aria-hidden />
           </span>
+        </button>
+      ) : null}
+
+      {!paused ? (
+        <button
+          type="button"
+          onClick={() => {
+            manuallyPausedRef.current = true
+            videoRef.current?.pause()
+          }}
+          className="absolute bottom-3 right-3 z-30 inline-flex min-h-10 items-center gap-2 rounded-full border border-white/20 bg-black/75 px-3.5 text-[13px] font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/90 focus-visible:outline-white"
+          aria-label="Pause the Harmonia Mobile demo"
+        >
+          <Pause className="size-3.5 fill-current" aria-hidden />
+          Pause preview
         </button>
       ) : null}
     </div>

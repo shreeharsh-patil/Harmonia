@@ -139,9 +139,9 @@ function MetricTile({
           {value}
         </p>
 
-        <p className="text-[13px] leading-snug text-white/45">{label}</p>
+        <p className="text-sm leading-snug text-white/55">{label}</p>
 
-        <p className="mt-auto pt-2 font-mono text-[10.5px] uppercase tracking-[0.12em] text-white/30">
+        <p className="mt-auto pt-2 font-mono text-xs uppercase tracking-[0.1em] text-white/40">
           {foot}
         </p>
       </a>

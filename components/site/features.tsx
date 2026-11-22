@@ -122,7 +122,7 @@ function FeatureCard({
               <span className="grid size-8 shrink-0 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.04]">
                 {icon}
               </span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
+              <span className="font-mono text-xs uppercase tracking-[0.14em] text-white/45">
                 {kicker}
               </span>
             </div>
@@ -131,18 +131,18 @@ function FeatureCard({
               {title}
             </h3>
 
-            <p className="mt-2 text-pretty text-[13.5px] leading-relaxed text-white/45">{body}</p>
+            <p className="mt-2 text-pretty text-[15px] leading-relaxed text-white/55 sm:text-base">{body}</p>
           </div>
 
           {sideBySide ? (
             <div className="mt-4 hidden flex-wrap gap-1.5 lg:flex">
-              <span className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-0.5 font-mono text-[10px] text-white/60">
+              <span className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-0.5 font-mono text-[11px] text-white/65">
                 Direct JioSaavn & YTM
               </span>
-              <span className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-0.5 font-mono text-[10px] text-white/60">
+              <span className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-0.5 font-mono text-[11px] text-white/65">
                 Up to 320 kbps HQ
               </span>
-              <span className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-0.5 font-mono text-[10px] text-white/60">
+              <span className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-0.5 font-mono text-[11px] text-white/65">
                 Offline & Local First
               </span>
             </div>

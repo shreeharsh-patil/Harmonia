@@ -62,7 +62,7 @@ export function Footer() {
               <LogoWordmark className="-my-2 h-[52px]" />
             </div>
 
-            <p className="max-w-xs text-pretty text-[13px] leading-relaxed text-white/40">
+            <p className="max-w-xs text-pretty text-[15px] leading-relaxed text-white/50">
               Free, source-available music player for Android. Direct JioSaavn and YouTube Music streaming,
               LRCLib synced lyrics, offline downloads, and native background playback. No Spotify keys. No subscriptions.
             </p>
@@ -108,7 +108,7 @@ export function Footer() {
                       {...('external' in link && link.external
                         ? { target: '_blank', rel: 'noopener noreferrer' }
                         : {})}
-                      className="group inline-flex items-center gap-1 text-[13px] text-white/45 transition-colors hover:text-white"
+                      className="group inline-flex items-center gap-1 text-sm text-white/55 transition-colors hover:text-white"
                     >
                       {link.label}
                       {'external' in link && link.external ? (
@@ -148,7 +148,7 @@ export function Footer() {
               <span>© {year} Harmonia Mobile</span>
             </div>
 
-            <p className="max-w-4xl text-pretty text-[11.5px] leading-relaxed text-white/25">
+            <p className="max-w-4xl text-pretty text-[12.5px] leading-relaxed text-white/35">
               Personal, source-available project shared for educational and personal use. All audio is sourced
               from free, publicly accessible providers (JioSaavn, YouTube Music, LRCLib) and local device files.
               No Spotify API or credentials are used or required. Harmonia does not host, upload, or store copyrighted
@@ -156,7 +156,7 @@ export function Footer() {
               with applicable terms of service.
             </p>
 
-            <p className="text-[11px] text-white/20">
+            <p className="text-xs text-white/30">
               Repository telemetry on this page is fetched live from the GitHub REST API and cached for five minutes.
             </p>
           </div>
