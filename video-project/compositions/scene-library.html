@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en" data-composition-id="scene-library" data-composition-duration="4.5">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Scene 5 — Offline Downloads & Local Music</title>
+  </head>
+  <body>
+    <template>
+      <style>
+        * {
+          box-sizing: border-box;
+        }
+        #root {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          font-family: 'Inter', sans-serif;
+          color: #f5f7f5;
+        }
+        .lib-stage {
+          position: absolute;
+          inset: 0;
+          background:
+            radial-gradient(ellipse 90% 42% at 50% 10%, rgba(44, 92, 134, 0.3) 0%, transparent 65%),
+            linear-gradient(180deg, #0b1620 0%, #060b09 58%, #050807 100%);
+        }
+        .lib-header {
+          position: absolute;
+          left: 68px;
+          right: 68px;
+          top: 96px;
+        }
+        .lib-title {
+          font-size: 62px;
+          font-weight: 900;
+          line-height: 1.05;
+          letter-spacing: -0.035em;
+          color: #f5f7f5;
+        }
+        .lib-word {
+          display: inline-block;
+          margin-right: 14px;
+        }
+        .lib-accent {
+          color: var(--accent, #18c964);
+        }
+        .lib-playlist-clip {
+          position: absolute;
+          left: 68px;
+          top: 280px;
+          width: 944px;
+          height: 516px;
+        }
+        .lib-playlist-card {
+          width: 944px;
+          height: 516px;
+          border-radius: 34px;
+          padding: 34px;
+          background: linear-gradient(155deg, rgba(20, 36, 52, 0.94) 0%, rgba(12, 19, 17, 0.96) 100%);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          box-shadow: 0 28px 64px rgba(0, 0, 0, 0.6);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+        .lib-pl-top {
+          display: flex;
+          align-items: center;
+          gap: 28px;
+        }
+        .lib-pl-art {
+          width: 224px;
+          height: 224px;
+          border-radius: 26px;
+          object-fit: cover;
+          flex-shrink: 0;
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+        }
+        .lib-pl-info {
+          flex: 1;
+          min-width: 0;
+        }
+        .lib-pl-kicker {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 28px;
+          font-weight: 700;
+          color: #18c964;
+        }
+        .lib-pl-name {
+          margin-top: 8px;
+          font-size: 46px;
+          font-weight: 900;
+          letter-spacing: -0.03em;
+          color: #ffffff;
+          line-height: 1.08;
+        }
+        .lib-pl-sub {
+          margin-top: 8px;
+          font-size: 30px;
+          font-weight: 400;
+          color: #b4c2cb;
+        }
+        .lib-pl-actions {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-top: 20px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .lib-pl-specs {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 28px;
+          font-weight: 700;
+          color: #d6ded9;
+        }
+        .lib-play-fab {
+          width: 96px;
+          height: 96px;
+          border-radius: 999px;
+          background: #18c964;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 12px 28px rgba(24, 201, 100, 0.35);
+        }
+        .lib-device-clip {
+          position: absolute;
+          left: 68px;
+          top: 830px;
+          width: 944px;
+          height: 790px;
+        }
+        .lib-device-card {
+          width: 944px;
+          height: 790px;
+          border-radius: 34px;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          background: #000000;
+          padding: 22px 24px;
+          box-shadow: 0 28px 64px rgba(0, 0, 0, 0.62);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .lib-device-img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          display: block;
+        }
+        .lib-mini-clip {
+          position: absolute;
+          left: 68px;
+          top: 1656px;
+          width: 944px;
+          height: 132px;
+        }
+        .lib-mini-player {
+          width: 944px;
+          height: 132px;
+          border-radius: 28px;
+          padding: 18px 26px;
+          background: rgba(18, 28, 24, 0.94);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+          box-shadow: 0 20px 44px rgba(0, 0, 0, 0.65);
+        }
+        .lib-mini-left {
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          min-width: 0;
+        }
+        .lib-mini-art {
+          width: 84px;
+          height: 84px;
+          border-radius: 16px;
+          object-fit: cover;
+          flex-shrink: 0;
+        }
+        .lib-mini-track {
+          font-size: 32px;
+          font-weight: 700;
+          color: #ffffff;
+        }
+        .lib-mini-route {
+          margin-top: 4px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 28px;
+          font-weight: 700;
+          color: #18c964;
+        }
+      </style>
+
+      <div id="root" data-composition-id="scene-library" data-duration="4.5">
+        <div class="lib-stage" id="lib-stage">
+          <header id="lib-header" class="clip lib-header" data-start="0" data-duration="4.5" data-track-index="1">
+            <h2 class="lib-title">
+              <span class="lib-word" id="libw1">Your</span>
+              <span class="lib-word" id="libw2">music,</span>
+              <br />
+              <span class="lib-word lib-accent" id="libw3">online</span>
+              <span class="lib-word" id="libw4">&amp;</span>
+              <span class="lib-word lib-accent" id="libw5">offline.</span>
+            </h2>
+          </header>
+
+          <div id="lib-playlist-clip" class="clip lib-playlist-clip" data-start="0" data-duration="4.5" data-track-index="2">
+            <div class="lib-playlist-card" id="lib-playlist-card">
+              <div class="lib-pl-top">
+                <img class="lib-pl-art" src="assets/artwork-cosy-coding.png" alt="cosy coding sessions playlist cover" />
+                <div class="lib-pl-info">
+                  <div class="lib-pl-kicker">Synced Playlist</div>
+                  <div class="lib-pl-name">cosy coding sessions</div>
+                  <div class="lib-pl-sub">Harmonia · 94 songs</div>
+                </div>
+              </div>
+              <div class="lib-pl-actions">
+                <span class="lib-pl-specs">FLAC · MP3 · M4A · WAV</span>
+                <div class="lib-play-fab" id="lib-play-fab">
+                  <svg width="42" height="42" viewBox="0 0 24 24" fill="#060b09" aria-hidden="true">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="lib-device-clip" class="clip lib-device-clip" data-start="0.1" data-duration="4.4" data-track-index="3">
+            <div class="lib-device-card" id="lib-device-card">
+              <img class="lib-device-img" src="assets/screen-library-cards.png" alt="Harmonia On this device Downloads Local Music Liked Music" />
+            </div>
+          </div>
+
+          <div id="lib-mini-clip" class="clip lib-mini-clip" data-start="0.05" data-duration="4.45" data-track-index="4">
+            <div class="lib-mini-player" id="lib-mini-player">
+              <div class="lib-mini-left">
+                <img class="lib-mini-art" src="assets/artwork-blinding-lights-square.png" alt="Now playing mini art" />
+                <div>
+                  <div class="lib-mini-track">Blinding Lights</div>
+                  <div class="lib-mini-route">Playing · Phone speaker</div>
+                </div>
+              </div>
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="#f5f7f5" aria-hidden="true">
+                <path d="M6 5h4v14H6zm8 0h4v14h-4z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          "use strict";
+          const tl = gsap.timeline({ paused: true });
+
+          // Opaque upward wipe over Scene 4 lyrics sheet so no crossfade ghosting appears at 20.5 s.
+          tl.fromTo(
+            "#lib-stage",
+            { clipPath: "inset(100% 0% 0% 0%)" },
+            { clipPath: "inset(0% 0% 0% 0%)", duration: 0.42, ease: "power3.inOut" },
+            0,
+          );
+
+          tl.fromTo(
+            ["#libw1", "#libw2", "#libw3", "#libw4", "#libw5"],
+            { opacity: 0, filter: "blur(8px)" },
+            { opacity: 1, filter: "blur(0px)", duration: 0.16, stagger: 0.055, ease: "power4.out" },
+            0.12,
+          );
+
+          tl.fromTo(
+            "#lib-playlist-card",
+            { y: 40, opacity: 0, scale: 0.97 },
+            { y: 0, opacity: 1, scale: 1, duration: 0.42, ease: "power4.out" },
+            0.08,
+          );
+
+          tl.fromTo(
+            "#lib-device-card",
+            { y: 56, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.42, ease: "power4.out" },
+            0.22,
+          );
+
+          // MiniPlayer glides smoothly up into bottom dock anchor.
+          tl.fromTo(
+            "#lib-mini-player",
+            { y: 36, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.38, ease: "power4.out" },
+            0.14,
+          );
+
+          // Play FAB tactile beat pulse inside playlist card.
+          tl.to("#lib-play-fab", { scale: 1.08, duration: 0.18, ease: "power2.out" }, 1.65);
+          tl.to("#lib-play-fab", { scale: 1, duration: 0.28, ease: "back.out(1.4)" }, 1.83);
+
+          tl.seek(0);
+          window.__timelines = window.__timelines || {};
+          window.__timelines["scene-library"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

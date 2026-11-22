@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en" data-composition-id="scene-hook" data-composition-duration="4.95">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Scene 1 — Hook & Home Discovery</title>
+  </head>
+  <body>
+    <template>
+      <style>
+        * {
+          box-sizing: border-box;
+        }
+        #root {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          font-family: 'Inter', sans-serif;
+          color: #f5f7f5;
+        }
+        .hook-stage {
+          position: absolute;
+          inset: 0;
+          background:
+            radial-gradient(ellipse 90% 45% at 50% 8%, rgba(24, 201, 100, 0.2) 0%, transparent 65%),
+            linear-gradient(180deg, #07130d 0%, #060b09 55%, #050807 100%);
+        }
+        .hook-header {
+          position: absolute;
+          left: 68px;
+          right: 68px;
+          top: 96px;
+        }
+        .hook-title {
+          font-size: 64px;
+          font-weight: 900;
+          line-height: 1.05;
+          letter-spacing: -0.035em;
+          color: #f5f7f5;
+        }
+        .hook-title-word {
+          display: inline-block;
+          margin-right: 14px;
+        }
+        .hook-accent {
+          color: var(--accent, #18c964);
+        }
+        .hook-pill-row {
+          margin-top: 22px;
+        }
+        .hook-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 22px;
+          border-radius: 999px;
+          border: 1px solid rgba(24, 201, 100, 0.35);
+          background: rgba(13, 25, 19, 0.92);
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 28px;
+          font-weight: 700;
+          color: #a7f3d0;
+          letter-spacing: -0.01em;
+        }
+        .hook-pill-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 999px;
+          background: #18c964;
+        }
+        .hook-viewport-clip {
+          position: absolute;
+          left: 68px;
+          top: 344px;
+          width: 944px;
+          height: 1468px;
+        }
+        .hook-viewport-card {
+          position: relative;
+          width: 944px;
+          height: 1468px;
+          border-radius: 34px;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          background: #000000;
+          box-shadow: 0 32px 72px rgba(0, 0, 0, 0.65);
+        }
+        .hook-feed-track {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 944px;
+          background: #000000;
+        }
+        .hook-feed-img {
+          display: block;
+          width: 944px;
+          height: auto;
+        }
+        .hook-dock-fade {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 220px;
+          background: linear-gradient(180deg, rgba(6, 11, 9, 0) 0%, rgba(6, 11, 9, 0.95) 68%, #060b09 100%);
+          pointer-events: none;
+        }
+        .hook-dock {
+          position: absolute;
+          left: 36px;
+          right: 36px;
+          bottom: 30px;
+          height: 112px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          background: rgba(18, 28, 24, 0.94);
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          padding: 0 24px;
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+        }
+        .hook-tab {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding: 12px 26px;
+          border-radius: 999px;
+        }
+        .hook-tab-home {
+          background: rgba(24, 201, 100, 0.2);
+          color: #ffffff;
+        }
+        .hook-tab-search {
+          background: transparent;
+          color: rgba(245, 247, 245, 0.72);
+        }
+        .hook-tab-muted {
+          color: rgba(245, 247, 245, 0.6);
+        }
+        .hook-tab-label {
+          font-size: 28px;
+          font-weight: 700;
+          line-height: 1;
+        }
+        .hook-cursor {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 72px;
+          height: 72px;
+          pointer-events: none;
+          z-index: 40;
+          filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.5));
+        }
+        .hook-cursor-svg {
+          width: 100%;
+          height: 100%;
+          fill: #ffffff;
+          stroke: #060b09;
+          stroke-width: 1.5;
+          stroke-linejoin: round;
+          stroke-linecap: round;
+        }
+      </style>
+
+      <div id="root" data-composition-id="scene-hook" data-duration="4.95">
+        <div class="hook-stage" id="hook-stage">
+          <header id="hook-header" class="clip hook-header" data-start="0" data-duration="4.95" data-track-index="1">
+            <h1 class="hook-title">
+              <span class="hook-title-word" id="hook-w1">Free</span>
+              <span class="hook-title-word" id="hook-w2">music.</span>
+              <br />
+              <span class="hook-title-word hook-accent" id="hook-w3">Zero</span>
+              <span class="hook-title-word hook-accent" id="hook-w4">ads.</span>
+            </h1>
+            <div class="hook-pill-row" id="hook-pill-wrap">
+              <span class="hook-pill">
+                <span class="hook-pill-dot" aria-hidden="true"></span>
+                <span>JioSaavn · YTM · LRCLib</span>
+              </span>
+            </div>
+          </header>
+
+          <div id="hook-viewport-clip" class="clip hook-viewport-clip" data-start="0" data-duration="4.95" data-track-index="2">
+            <div class="hook-viewport-card" id="hook-viewport-card">
+              <div class="hook-feed-track" id="hook-feed-track">
+                <img class="hook-feed-img" src="assets/screen-home-top.png" alt="Harmonia Home top" />
+                <img class="hook-feed-img" src="assets/screen-home-feed.png" alt="Harmonia Home community feed" />
+              </div>
+
+              <div class="hook-dock-fade" data-layout-ignore></div>
+
+              <nav class="hook-dock" id="hook-dock" aria-label="Bottom Navigation">
+                <div class="hook-tab hook-tab-home" id="hook-tab-home">
+                  <span class="hook-tab-label">Home</span>
+                </div>
+                <div class="hook-tab hook-tab-search" id="hook-tab-search">
+                  <span class="hook-tab-label" id="hook-tab-search-label">Search</span>
+                </div>
+                <div class="hook-tab hook-tab-muted">
+                  <span class="hook-tab-label">Library</span>
+                </div>
+                <div class="hook-tab hook-tab-muted">
+                  <span class="hook-tab-label">Profile</span>
+                </div>
+              </nav>
+            </div>
+          </div>
+
+          <div class="clip hook-cursor" id="hook-cursor-clip" data-start="2.8" data-duration="2.15" data-track-index="3" data-layout-ignore>
+            <div id="hook-cursor" style="width: 100%; height: 100%">
+              <svg class="hook-cursor-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 3 L5 19 L9 15 L12 22 L15 20.5 L11.5 14 L18 14 Z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          "use strict";
+          const tl = gsap.timeline({ paused: true });
+
+          // Frame 0 already shows "Free music." + real Home screen; "Zero ads." snaps crisp immediately.
+          tl.set(["#hook-w1", "#hook-w2"], { opacity: 1, filter: "blur(0px)" });
+          tl.fromTo(
+            ["#hook-w3", "#hook-w4"],
+            { opacity: 0.25, filter: "blur(6px)" },
+            { opacity: 1, filter: "blur(0px)", duration: 0.2, stagger: 0.06, ease: "power4.out" },
+            0,
+          );
+          tl.fromTo(
+            "#hook-pill-wrap",
+            { opacity: 0, y: 12 },
+            { opacity: 1, y: 0, duration: 0.35, ease: "power4.out" },
+            0.12,
+          );
+
+          // Viewport arrives softly settled on frame 0 and scrolls smoothly through Home discovery -> Community & Hindi Playlists.
+          tl.fromTo(
+            "#hook-viewport-card",
+            { scale: 1.02 },
+            { scale: 1, duration: 0.45, ease: "power4.out" },
+            0,
+          );
+          tl.fromTo(
+            "#hook-feed-track",
+            { y: 0 },
+            { y: -1120, duration: 2.35, ease: "power2.inOut" },
+            0.6,
+          );
+
+          // Oversized cursor arrives from lower-right and clicks Search tab at 3.60 s.
+          tl.set("#hook-cursor", { xPercent: -20.83, yPercent: -12.5 });
+          tl.fromTo(
+            "#hook-cursor",
+            { x: 920, y: 1960, opacity: 0, scale: 1 },
+            { x: 432, y: 1706, opacity: 1, duration: 0.55, ease: "power3.out" },
+            2.95,
+          );
+          tl.to("#hook-cursor", { scale: 0.88, duration: 0.09, ease: "power2.in", transformOrigin: "20.83% 12.5%" }, 3.58);
+          tl.to("#hook-cursor", { scale: 1, duration: 0.16, ease: "power2.out", transformOrigin: "20.83% 12.5%" }, 3.67);
+
+          // Tab tap ignites Search in emerald; stays live under Scene 2 overlap (4.50 - 4.95 s).
+          tl.fromTo(
+            "#hook-tab-search",
+            { scale: 1, backgroundColor: "rgba(24, 201, 100, 0)" },
+            { scale: 0.94, backgroundColor: "rgba(24, 201, 100, 0.25)", color: "#18C964", duration: 0.12, ease: "power2.out" },
+            3.62,
+          );
+          tl.to("#hook-tab-search", { scale: 1, duration: 0.18, ease: "back.out(1.4)" }, 3.74);
+
+          tl.to(
+            "#hook-viewport-card",
+            { scale: 1.08, y: -40, duration: 0.55, ease: "power2.in" },
+            4.25,
+          );
+          tl.to("#hook-header", { opacity: 0, duration: 0.18, ease: "power2.in" }, 4.3);
+
+          tl.seek(0);
+          window.__timelines = window.__timelines || {};
+          window.__timelines["scene-hook"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>
