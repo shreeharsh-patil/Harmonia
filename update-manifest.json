@@ -1,7 +1,7 @@
 {
   "platform": "android",
-  "version": "2.1.8",
-  "versionCode": 69,
+  "version": "2.1.10",
+  "versionCode": 71,
   "minimumSupportedVersionCode": 40,
   "channel": "production",
   "mandatory": false,
@@ -10,11 +10,11 @@
     "Automatic in-app update engine with SHA-256 integrity verification",
     "Full offline library downloads, synchronized lyrics suite, and equalizer"
   ],
-  "apkUrl": "https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.1.8/Harmonia-mobile.apk",
-  "sha256": "a269b8ffc463ac4090b97f2fe4be72e330d237a7f9275c4d50fc6e11081a1873",
-  "fileSize": 130891666,
-  "releasedAt": "2026-11-22T17:54:54Z",
-  "latestVersion": "2.1.8",
+  "apkUrl": "https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.1.10/Harmonia-mobile.apk",
+  "sha256": "a2524ac0bdc708408194f0216ebdd03e49017b1c72ba63bfafa28bc982db673a",
+  "fileSize": 131887530,
+  "releasedAt": "2026-11-28T12:06:14Z",
+  "latestVersion": "2.1.10",
   "minimumSupportedVersion": "2.0.0",
-  "downloadUrl": "https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.1.8/Harmonia-mobile.apk"
+  "downloadUrl": "https://github.com/shreeharsh-patil/Harmonia/releases/download/v2.1.10/Harmonia-mobile.apk"
 }
